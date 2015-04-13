@@ -45,7 +45,11 @@ $ bin/elastic2json --help
 
 #### 示例
 1. 将本地 Elastic 服务（服务端口为9200）的 fooindex 索引的数据以 JSON 格式导出，输出到控制台标准输出
-       $ bin/elastic2json --host localhost:9200 --indices fooindex
+```
+  $ bin/elastic2json --host localhost:9200 --indices fooindex
+```
 
 2. 将 IP 地址为 10.9.0.1，端口为9200的 Elastic 服务的 logstash-2015.03.03 索引数据以 JSON 格式导出到磁盘文件 log.json
-       $ bin/elastic2json --host 10.9.0.1:9200 --indices logstash-2015.03.03 > log.json
+```
+  $ bin/elastic2json --host 10.9.0.1:9200 --indices logstash-2015.03.03 > log.json
+```
