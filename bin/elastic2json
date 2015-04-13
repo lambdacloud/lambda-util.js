@@ -6,10 +6,10 @@ var assert = require('assert');
 
 // Get command line arguments
 program.version('0.1.0')
-  .option('-H, --host <eshost>', 'Specify Elasticsearch host and port, default: localhost:9200', 'localhost:9200')
+  .option('-H, --host <Elastic Host>', 'Specify Elasticsearch host and port, default: localhost:9200', 'localhost:9200')
   .option('-D, --debug', 'Enable Debugging')
-  .option('-i, --indices <src indices>', 'Specify indices')
-  .option('--api <version>', 'Specify Elasticsearch API version, such as, 1.1, 1.2, 1.3, default: 1.3.', '1.4')
+  .option('-i, --indices <Elastic indices>', 'Specify indices')
+  .option('--api <version>', 'Specify Elasticsearch API version, such as, 1.1, 1.2, 1.3, default: 1.4.', '1.4')
   .parse(process.argv);
 
 // Required options
