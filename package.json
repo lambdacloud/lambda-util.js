@@ -1,0 +1,31 @@
+{
+  "name": "lambda-util.js",
+  "version": "0.1.0",
+  "description": "The utilities provided by Lambdacloud service",
+  "main": "lambda-util.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "elastic2json": "./bin/elastic2json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lambdacloud/lambda-util.js.git"
+  },
+  "keywords": [
+    "lambdacloud"
+  ],
+  "author": "Wezhang",
+  "license": "Apache License",
+  "bugs": {
+    "url": "https://github.com/lambdacloud/lambda-util.js/issues"
+  },
+  "homepage": "https://github.com/lambdacloud/lambda-util.js",
+  "dependencies": {
+    "commander": "^2.7.1",
+    "debug": "^2.1.3",
+    "elasticsearch": "^4.0.2",
+    "lodash": "^3.6.0"
+  }
+}
