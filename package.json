@@ -4,7 +4,7 @@
   "description": "The utilities provided by Lambdacloud service",
   "main": "lambda-util.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "bin": {
     "elastic2json": "./bin/elastic2json"
@@ -24,8 +24,15 @@
   "homepage": "https://github.com/lambdacloud/lambda-util.js",
   "dependencies": {
     "commander": "^2.7.1",
+    "csv-stringify": "0.0.6",
     "debug": "^2.1.3",
     "elasticsearch": "^4.0.2",
+    "event-stream": "^3.3.0",
     "lodash": "^3.6.0"
+  },
+  "devDependencies": {
+    "mocha": "^2.2.4",
+    "should": "^5.2.0",
+    "sinon": "^1.14.1"
   }
 }

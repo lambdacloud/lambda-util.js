@@ -1,0 +1,5 @@
+--require should
+--require sinon
+--reporter dot
+--ui bdd
+--recursive

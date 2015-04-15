@@ -33,6 +33,11 @@ var elastic = new LambdaUtil.ElasticPipe({
   keepAlive: false
 }, program.indices, program.type);
 
-var jsonline = new LambdaUtil.JsonLine();
+var elasticDocFlat = new LambdaUtil.ElasticDocFlat();
+var stringify = require('csv-stringify');
+var stringifier = stringify({ header: true });
 
-elastic.pipe(jsonline).pipe(process.stdout);
+elastic
+  .pipe(elasticDocFlat)
+  .pipe(stringifier)
+  .pipe(process.stdout);
