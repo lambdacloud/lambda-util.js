@@ -36,8 +36,10 @@ var elastic = new LambdaUtil.ElasticPipe({
 var elasticDocFlat = new LambdaUtil.ElasticDocFlat();
 var stringify = require('csv-stringify');
 var stringifier = stringify({ header: true });
+var arrayTrans = new LambdaUtil.ArrayTrans();
 
 elastic
+  .pipe(arrayTrans)
   .pipe(elasticDocFlat)
   .pipe(stringifier)
   .pipe(process.stdout);
