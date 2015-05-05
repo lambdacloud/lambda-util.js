@@ -25,18 +25,19 @@ if (program.debug) {
   esLogLevel = 'debug';
 }
 
+//use elasticRead, arrayTrans, jsonLine to pipe data
 var LambdaUtil = require('../lambda-util');
 
-var elastic = new LambdaUtil.ElasticPipe({
+var jsonline = new LambdaUtil.JsonLine();
+var arrayTrans = new LambdaUtil.ArrayTrans();
+var elasticRead = new LambdaUtil.ElasticReadPipe({
   host: program.host,
   log: esLogLevel,
   keepAlive: false
 }, program.indices, program.type);
 
-var jsonline = new LambdaUtil.JsonLine();
-var arrayTrans = new LambdaUtil.ArrayTrans();
 
-elastic
+elasticRead
   .pipe(arrayTrans)
   .pipe(jsonline)
   .pipe(process.stdout);

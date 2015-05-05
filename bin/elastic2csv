@@ -27,7 +27,7 @@ if (program.debug) {
 
 var LambdaUtil = require('../lambda-util');
 
-var elastic = new LambdaUtil.ElasticPipe({
+var elastic = new LambdaUtil.ElasticReadPipe({
   host: program.host,
   log: esLogLevel,
   keepAlive: false
