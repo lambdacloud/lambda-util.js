@@ -7,7 +7,7 @@
 var program = require('commander');
 var _ = require('lodash');
 var assert = require('assert');
-var JSONStream = require("json-stream");
+var jsonStream = require("json-stream");
 
 // Get command line arguments, now is form standard input
 program.version('0.1.0')
@@ -27,7 +27,7 @@ if (program.debug) {
 
 //use stream, stringLine, elasticWrite to pipe data
 var LambdaUtil = require('../lambda-util');
-var stream = JSONStream();
+var stream = jsonStream();
 var stringLine = new LambdaUtil.StringLine(program.indices, program.type);
 //var stringArray = new LambdaUtil.StringArray();
 var elasticWrite = new LambdaUtil.ElasticWritePipe({
