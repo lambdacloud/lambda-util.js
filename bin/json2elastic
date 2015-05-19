@@ -6,7 +6,6 @@
 
 var program = require('commander');
 var _ = require('lodash');
-var assert = require('assert');
 var jsonStream = require("json-stream");
 
 // Get command line arguments, now is form standard input
@@ -20,17 +19,17 @@ program.version('0.1.0')
 
 var esLogLevel = 'warning';
 if (program.debug) {
-  var Debug = require('debug');
-  Debug.enable('elasticwrite-pipe:debug');
+  var debug = require('debug');
+  debug.enable('elastic-write-pipe:debug');
   esLogLevel = 'debug';
 }
 
 //use stream, stringLine, elasticWrite to pipe data
-var LambdaUtil = require('../lambda-util');
+var lambdaUtil = require('../lambda-util');
 var stream = jsonStream();
-var stringLine = new LambdaUtil.StringLine(program.indices, program.type);
+var stringLine = new lambdaUtil.ElasticIndexDoc(program.indices, program.type);
 //var stringArray = new LambdaUtil.StringArray();
-var elasticWrite = new LambdaUtil.ElasticWritePipe({
+var elasticWrite = new lambdaUtil.ElasticWritePipe({
   host: program.host,
   log: esLogLevel,
   keepAlive: false
