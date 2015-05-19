@@ -1,4 +1,8 @@
 #!/usr/bin/env node
+/**
+ * LambdaCloud copyright 2015.
+ *
+ */
 
 var program = require('commander');
 var _ = require('lodash');
@@ -25,7 +29,7 @@ if (program.debug) {
 var LambdaUtil = require('../lambda-util');
 var stream = JSONStream();
 var stringLine = new LambdaUtil.StringLine(program.indices, program.type);
-// var stringArray = new LambdaUtil.StringArray();
+//var stringArray = new LambdaUtil.StringArray();
 var elasticWrite = new LambdaUtil.ElasticWritePipe({
   host: program.host,
   log: esLogLevel,
@@ -37,5 +41,5 @@ var elasticWrite = new LambdaUtil.ElasticWritePipe({
 process.stdin
   .pipe(stream)
   .pipe(stringLine)
-  // .pipe(stringArray)
+  //.pipe(stringArray)
   .pipe(elasticWrite);

@@ -1,4 +1,8 @@
 #!/usr/bin/env node
+/**
+ * LambdaCloud copyright 2015.
+ *
+ */
 
 var program = require('commander');
 var _ = require('lodash');

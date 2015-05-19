@@ -1,4 +1,8 @@
 #!/usr/bin/env node
+/**
+ * LambdaCloud copyright 2015.
+ *
+ */
 
 var program = require('commander');
 var _ = require('lodash');
@@ -28,7 +32,7 @@ if (program.debug) {
 //use elasticRead, arrayTrans, jsonLine to pipe data
 var LambdaUtil = require('../lambda-util');
 
-var jsonline = new LambdaUtil.JsonLine();
+var jsonLine = new LambdaUtil.JsonLine();
 var arrayTrans = new LambdaUtil.ArrayTrans();
 var elasticRead = new LambdaUtil.ElasticReadPipe({
   host: program.host,
@@ -39,5 +43,5 @@ var elasticRead = new LambdaUtil.ElasticReadPipe({
 
 elasticRead
   .pipe(arrayTrans)
-  .pipe(jsonline)
+  .pipe(jsonLine)
   .pipe(process.stdout);
