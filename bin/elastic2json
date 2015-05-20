@@ -1,4 +1,8 @@
 #!/usr/bin/env node
+/**
+ * LambdaCloud copyright 2015.
+ *
+ */
 
 var program = require('commander');
 var _ = require('lodash');
@@ -20,23 +24,24 @@ _.forEach(['indices'], function (opt) {
 
 var esLogLevel = 'warning';
 if (program.debug) {
-  var Debug = require('debug');
-  Debug.enable('elastic-pipe:debug');
+  var debug = require('debug');
+  debug.enable('elastic-pipe:debug');
   esLogLevel = 'debug';
 }
 
-var LambdaUtil = require('../lambda-util');
+//use elasticRead, arrayTrans, jsonLine to pipe data
+var lambdaUtil = require('../lambda-util');
 
-var elastic = new LambdaUtil.ElasticPipe({
+var jsonLine = new lambdaUtil.JsonLine();
+var arrayTrans = new lambdaUtil.ArrayTrans();
+var elastic = new lambdaUtil.ElasticPipe ({
   host: program.host,
   log: esLogLevel,
   keepAlive: false
 }, program.indices, program.type);
 
-var jsonline = new LambdaUtil.JsonLine();
-var arrayTrans = new LambdaUtil.ArrayTrans();
 
 elastic
   .pipe(arrayTrans)
-  .pipe(jsonline)
+  .pipe(jsonLine)
   .pipe(process.stdout);
