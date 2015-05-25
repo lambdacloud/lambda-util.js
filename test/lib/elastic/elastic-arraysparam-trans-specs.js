@@ -125,7 +125,7 @@ function assertArraysTrans(input, expect, done) {
   var elasticArraysparamTrans = new ElasticArraysparamTrans();
   var reader = eventStream.readArray(input);
   var writer = eventStream.writeArray(function (err, array) {
-    array.should.eql(expect);
+    array[1].should.eql(expect);
     //console.log(array[0][0].index);
     done();
   });
