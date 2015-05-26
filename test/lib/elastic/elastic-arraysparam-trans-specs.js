@@ -1,6 +1,3 @@
-/**
- * Created by sunyonggang on 2015/5/22.
- */
 var ElasticArraysparamTrans = require('../../../lib/elastic/elastic-arraysparam-trans');
 var eventStream = require('event-stream');
 
@@ -122,11 +119,10 @@ describe('this is a test for elastic-arraysparam-trans', function() {
 })
 
 function assertArraysTrans(input, expect, done) {
-  var elasticArraysparamTrans = new ElasticArraysparamTrans();
+  var elasticArraysparamTrans = new ElasticArraysparamTrans(4);
   var reader = eventStream.readArray(input);
   var writer = eventStream.writeArray(function (err, array) {
     array[1].should.eql(expect);
-    //console.log(array[0][0].index);
     done();
   });
 
