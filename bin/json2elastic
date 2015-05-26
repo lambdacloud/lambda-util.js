@@ -29,7 +29,7 @@ var arraySize = 100;
 var lambdaUtil = require('../lambda-util');
 var stream = jsonStream();
 var stringLine = new lambdaUtil.ElasticIndexDoc(program.indices, program.type);
-var stringArray = new lambdaUtil.StringArray(arraySize);
+var elasticBulkArray = new lambdaUtil.ElasticBulkArray(arraySize);
 var elasticWrite = new lambdaUtil.ElasticWritePipe({
   host: program.host,
   log: esLogLevel,
@@ -41,5 +41,5 @@ var elasticWrite = new lambdaUtil.ElasticWritePipe({
 process.stdin
   .pipe(stream)
   .pipe(stringLine)
-  .pipe(stringArray)
+  .pipe(elasticBulkArray)
   .pipe(elasticWrite);
