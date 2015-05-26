@@ -14,7 +14,6 @@ program.version('0.1.0')
   .option('-D, --debug', 'Enable Debugging')
   .option('-i, --indices <Elastic indices>', 'Specify indices')
   .option('-t, --type <Elastic type>', 'Specify type')
-  .option('-s, --size <Elastic bulk size>', 'Specify bulk size')
   .option('--api <version>', 'Specify Elasticsearch API version, such as, 1.1, 1.2, 1.3, default: 1.4.', '1.4')
   .parse(process.argv);
 
@@ -26,10 +25,11 @@ if (program.debug) {
 }
 
 //use stream, stringLine, elasticWrite to pipe data
+var arraySize = 100;
 var lambdaUtil = require('../lambda-util');
 var stream = jsonStream();
 var stringLine = new lambdaUtil.ElasticIndexDoc(program.indices, program.type);
-var stringArray = new lambdaUtil.StringArray(program.size);
+var stringArray = new lambdaUtil.StringArray(arraySize);
 var elasticWrite = new lambdaUtil.ElasticWritePipe({
   host: program.host,
   log: esLogLevel,
