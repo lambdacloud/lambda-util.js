@@ -116,7 +116,7 @@ describe('this is a test for elastic-arraysparam-trans', function() {
     var result1 = [message1, message2, message3, message4];
     var result2 = [message5, message6, message7, message8];
     var result3 = [message9];
-    var myResult = [result1, result2, result3]
+    var myResult = [result1, result2, result3];
     assertArraysTrans(sourceArray, myResult, done);
   })
 })
@@ -125,9 +125,7 @@ function assertArraysTrans(input, expect, done) {
   var elasticArraysparamTrans = new ElasticArraysparamTrans(4);
   var reader = eventStream.readArray(input);
   var writer = eventStream.writeArray(function (err, array) {
-    array[0].should.eql(expect[0]);
-    array[1].should.eql(expect[1]);
-    array[2].should.eql(expect[2]);
+    array.should.eql(expect);
     done();
   });
 
