@@ -1,0 +1,11 @@
+{
+    "env": {
+        "mocha": true,
+        "node": true
+    },
+    "rules": {
+      "no-use-before-define": [0],
+      "quotes": [1, "single", "avoid-escape"],
+      "max-len": [2, 120, 2]
+    }
+}
