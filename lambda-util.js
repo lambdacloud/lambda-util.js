@@ -6,4 +6,4 @@ exports.SetsPlus = require('./lib/sets-plus');
 exports.ElasticIndexDoc = require("./lib/elastic/elastic-indexparam-trans");
 exports.ElasticWritePipe = require("./lib/elastic/elastic-write-pipe");
 exports.ElasticBulkArray = require("./lib/elastic/elastic-arraysparam-trans");
-exports.JsonAddFieldParser = require("./lib/tool/json-addfield-parser");
+exports.JsonAddFieldParser = require("./lib/elastic/elastic-docflat-parse");
