@@ -8,7 +8,7 @@ var program = require('commander');
 var _ = require('lodash');
 var jsonStream = require("json-stream");
 
-// Get command line arguments, now is form standard input
+// Get command line arguments, now is form standard input & output
 program.version('0.1.0')
   .option('-H, --host <Elastic Host>', 'Specify Elasticsearch host and port, default: localhost:9200', 'localhost:9200')
   .option('-D, --debug', 'Enable Debugging')
@@ -24,11 +24,9 @@ if (program.debug) {
   esLogLevel = 'debug';
 }
 
-//use stream, stringLine, elasticWrite to pipe data
-var arraySize = 100;
+//use stream, jsonAddField to pipe data to standard output
 var lambdaUtil = require('../lambda-util');
 var stream = jsonStream();
-var stringLine = new lambdaUtil.ElasticIndexDoc(program.indices, program.type);
 var jsonAddField = new lambdaUtil.JsonAddFieldParser();
 
 
@@ -37,5 +35,4 @@ process.stdin
   .pipe(stream)
   .pipe(jsonAddField)
   .pipe(process.stdout);
-  //.pipe(elasticBulkArray)
-  //.pipe(elasticWrite);
+
