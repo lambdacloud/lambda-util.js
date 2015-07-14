@@ -12,11 +12,13 @@ var jsonStream = require("json-stream");
 var lambdaUtil = require('../lambda-util');
 var stream = jsonStream();
 var jsonAddField = new lambdaUtil.JsonAddFieldParser();
+var jsonLine = new lambdaUtil.JsonLine();
 
 
 // use pipe deal with the data from standard in
 process.stdin
   .pipe(stream)
   .pipe(jsonAddField)
+  .pipe(jsonLine)
   .pipe(process.stdout);
 
