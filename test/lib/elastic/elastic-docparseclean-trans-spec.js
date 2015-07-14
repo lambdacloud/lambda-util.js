@@ -1,4 +1,4 @@
-var ElasticDocFlatParse = require('../../../lib/elastic/elastic-docflat-parse');
+var ElasticDocFlatParse = require('../../../lib/elastic/elastic-docparseclean-trans');
 var eventStream = require('event-stream');
 
 describe('this is a test for elastic-docflat-parse', function() {
