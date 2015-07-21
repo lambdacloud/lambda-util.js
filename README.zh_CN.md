@@ -53,3 +53,39 @@ $ bin/elastic2json --help
 ```
   $ bin/elastic2json --host 10.9.0.1:9200 --indices logstash-2015.03.03 > log.json
 ```
+
+## LambdaCloud 相关工具
+
+此类工具是和览云共有云服务相关工具，提供日志的上载等相关服务。
+
+#### 命令
+    bin/line2lambdacloud --token <user_token>
+
+#### 参数列表
+
+```
+$ bin/line2lambdacloud --help
+
+  Usage:  [options]
+
+  Usage: line2lambdacloud [options]
+
+  Options:
+
+    -h, --help                          output usage information
+    -V, --version                       output the version number
+    -D, --debug                         Enable Debugging
+    -P, --proxy <http proxy>            Set proxy
+    -T, --token <token of lambdacloud>  Specify the token
+```
+
+#### 示例
+1. 发送一条日志到Lambdacloud的日志服务
+```
+  $ echo 'Hello LambdaCloud log service!' | bin/line2lambdacloud --token 4eb15944-2475-4238-af07-608957fc72fa
+```
+
+2. 将一个日志文件发送到Lambdacloud的日志服务
+```
+  $ cat /var/log/syslog | bin/line2lambdacloud --token 4eb15944-2475-4238-af07-608957fc72fa
+```
