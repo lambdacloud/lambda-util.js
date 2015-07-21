@@ -23,13 +23,18 @@
   },
   "homepage": "https://github.com/lambdacloud/lambda-util.js",
   "dependencies": {
+    "byline": "^4.2.1",
     "commander": "^2.7.1",
     "csv-stringify": "0.0.6",
     "debug": "^2.1.3",
     "elasticsearch": "^4.0.2",
     "event-stream": "^3.3.0",
+    "json-stream": "1.0.0",
     "lodash": "^3.6.0",
-    "json-stream": "1.0.0"
+    "moment": "^2.10.3",
+    "progress": "^1.1.8",
+    "request": "^2.58.0",
+    "retry": "^0.6.1"
   },
   "devDependencies": {
     "mocha": "^2.2.4",

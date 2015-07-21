@@ -1,0 +1,38 @@
+#!/usr/bin/env node
+/**
+ * LambdaCloud copyright 2015.
+ *
+ */
+
+'use strict';
+
+var program = require('commander');
+var byline = require('byline');
+
+// Get command line arguments, now is form standard input
+program.version('0.1.0')
+  .option('-D, --debug', 'Enable Debugging')
+  .option('-P, --proxy <http proxy>', 'Set proxy')
+  .option('-T, --token <token of lambdacloud>', 'Specify the token')
+  .parse(process.argv);
+
+if (program.debug) {
+  var debug = require('debug');
+  debug.enable('lambdacloud-uploader:debug');
+}
+
+var lambdaUtil = require('../lambda-util');
+var lambdaUploader = new lambdaUtil.LambdacloudUploader({ token: program.token, proxy: program.proxy });
+var linestream = new byline.LineStream();
+
+//process.stdin.setEncoding('utf8');
+
+process.stdin
+  .pipe(linestream)
+  .pipe(lambdaUploader);
+
+process.on('SIGINT', function() {
+  console.log('Stopping...');
+  lambdaUploader.end();
+});
+
