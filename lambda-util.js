@@ -8,4 +8,5 @@ exports.ElasticWritePipe = require('./lib/elastic/elastic-write-pipe');
 exports.ElasticUpdatePipe = require('./lib/elastic/elastic-update-pipe');
 exports.ElasticBulkArray = require('./lib/elastic/elastic-arraysparam-trans');
 exports.JsonAddFieldParser = require('./lib/elastic/elastic-docparseclean-trans');
+exports.JsonAddOrigin = require('./lib/elastic/elastic-docaddorigin-trans');
 exports.LambdacloudUploader = require('./lib/lambdacloud/lambdacloud-uploader');
