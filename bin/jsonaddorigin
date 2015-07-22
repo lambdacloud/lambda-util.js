@@ -3,22 +3,41 @@
  * LambdaCloud copyright 2015.
  *
  */
-
 var program = require('commander');
 var _ = require('lodash');
 var jsonStream = require("json-stream");
+var eventStream = require('event-stream');
 
 //use stream, jsonAddOrigin to pipe data to standard output
 var lambdaUtil = require('../lambda-util');
 var stream = jsonStream();
-var jsonAddOrigin = new lambdaUtil.JsonAddOrigin();
+//var jsonAddOrigin = new lambdaUtil.JsonAddOrigin();
 var jsonLine = new lambdaUtil.JsonLine();
 
 
 // use pipe deal with the data from standard in
 process.stdin
   .pipe(stream)
-  .pipe(jsonAddOrigin)
+  .pipe(eventStream.through(jsonAddOrigin))
   .pipe(jsonLine)
   .pipe(process.stdout);
 
+function jsonAddOrigin(data) {
+  // distinguish the data source
+  if (data._source['user_id']) {
+    delete data._source;
+    data._source = {};
+    data._source['来源'] = '服务器端';
+
+  } else if (data._source['用户ID']) {
+    delete data._source;
+    data._source = {};
+    data._source['来源'] = '客户端';
+
+  } else {
+    delete data._source;
+    data._source = {};
+  }
+
+  this.push(data);
+}

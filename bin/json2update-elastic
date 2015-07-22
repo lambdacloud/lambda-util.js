@@ -24,7 +24,7 @@ if (program.debug) {
   esLogLevel = 'debug';
 }
 
-//use stream, stringLine, elasticWrite to pipe data
+//use stream, stringLine, elasticUpdate to pipe data
 var arraySize = 100;
 var lambdaUtil = require('../lambda-util');
 var stream = jsonStream();
