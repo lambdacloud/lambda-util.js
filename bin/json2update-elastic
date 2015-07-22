@@ -20,7 +20,7 @@ program.version('0.1.0')
 var esLogLevel = 'warning';
 if (program.debug) {
   var debug = require('debug');
-  debug.enable('elastic-write-pipe:debug');
+  debug.enable('elastic-update-pipe:debug');
   esLogLevel = 'debug';
 }
 
