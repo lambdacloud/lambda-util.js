@@ -76,6 +76,7 @@ $ bin/line2lambdacloud --help
     -V, --version                       output the version number
     -D, --debug                         Enable Debugging
     -P, --proxy <http proxy>            Set proxy
+    -B, --batch <batch size>            Set http uploading request batch size, by default: 64
     -T, --token <token of lambdacloud>  Specify the token
 ```
 
