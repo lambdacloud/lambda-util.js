@@ -11,7 +11,7 @@ var byline = require('byline');
 var eventStream = require('event-stream');
 
 // Get command line arguments, now is form standard input
-program.version('0.1.0')
+program.version('0.1.1')
   .option('-D, --debug', 'Enable Debugging')
   .option('-P, --proxy <http proxy>', 'Set proxy')
   .option('-B, --batch <batch size>', 'Set http uploading request batch size, by default: 64', 64)
