@@ -17,18 +17,21 @@ var jsonLine = new lambdaUtil.JsonLine();
 // use pipe deal with the data from standard in
 process.stdin
   .pipe(stream)
-  .pipe(eventStream.through(jsonAddUserid))
+  .pipe(eventStream.through(jsonAddUserId))
   .pipe(jsonLine)
   .pipe(process.stdout);
 
-function jsonAddUserid(data) {
+function jsonAddUserId(data) {
 
-  //if data from fore-end, then add 'user_id' & '#user_id', delete '用户ID', '#用户ID'
+  //if data from fore-end, then add 'user_id' & '#user_id', remain '用户ID', '#用户ID'
   if (data._source['来源'] === '客户端') {
-    data._source['user_id'] = data._source['用户ID'];
-    data._source['#user_id'] = data._source['#用户ID'];
-    delete data._source['用户ID'];
-    delete data._source['#用户ID'];
+    var userId = data._source['用户ID'];
+    var userIdWithPound = data._source['#用户ID'];
+    data._source = {};
+    data._source['user_id'] = userId;
+    data._source['#user_id'] = userIdWithPound;
+  } else {
+    data._source = {};
   }
 
   this.push(data);
