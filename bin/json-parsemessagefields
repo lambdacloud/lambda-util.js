@@ -17,15 +17,17 @@ var jsonLine = new lambdaUtil.JsonLine();
 // use pipe deal with the data from standard in
 process.stdin
   .pipe(stream)
-  .pipe(eventStream.through(jsonAddTimestamp))
+  .pipe(eventStream.through(parseMessageFields))
   .pipe(jsonLine)
   .pipe(process.stdout);
 
-function jsonAddTimestamp(data) {
-  var reg =new RegExp('.*时间\\[\([0-9ZT:.+-]*\)\\].*');
+function parseMessageFields(data) {
+  var reg =new RegExp('.*时间\\[\([0-9ZT:.+-]*\)\\]');
   //var timestamp = reg.exec(data._source['message']);
-  var timestamp = data._source['message'].match(reg)[1];
-  data._source['timestamp'] = timestamp;
-
+  if (reg.test(data._source['message'])) {
+    var timestamp = data._source['message'].match(reg)[1];
+    data._source['timestamp'] = timestamp;
+  }
+  
   this.push(data);
 }
