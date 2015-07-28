@@ -1,0 +1,41 @@
+#!/usr/bin/env node
+/**
+ * LambdaCloud copyright 2015.
+ *
+ */
+
+var program = require('commander');
+var _ = require('lodash');
+var jsonStream = require("json-stream");
+var eventStream = require('event-stream');
+var moment = require('moment');
+
+//use stream, jsonAddField to pipe data to standard output
+var lambdaUtil = require('../lambda-util');
+var stream = jsonStream();
+var jsonLine = new lambdaUtil.JsonLine();
+
+
+// use pipe deal with the data from standard in
+process.stdin
+  .pipe(stream)
+  .pipe(eventStream.through(jsonAddOtherTimeField))
+  .pipe(jsonLine)
+  .pipe(process.stdout);
+
+
+function jsonAddOtherTimeField(data) {
+
+  //if data._source have 'timestamp', then add field
+  if (data._source['timestamp']) {
+    var docTimestamp = moment.utc(data._source['timestamp']);
+    var hour = docTimestamp.hours();
+    data._source['sys_timestamp'] = new Date().toISOString();
+    data._source["date_timestamp"] = docTimestamp.format('YYYY-MM-DDT00:00:00.000') + 'Z';
+    data._source["hour_timestamp"] = docTimestamp.format('YYYY-MM-DDTHH:00:00.000') + 'Z';
+    data._source["date"] = docTimestamp.format('YYYY-MM-DD');
+    data._source["#hour"] = hour;
+  }
+
+  this.push(data);
+}
