@@ -27,8 +27,8 @@ process.stdin
 function jsonAddOtherTimeField(data) {
 
   //if data._source have 'timestamp', then add field
-  if (data._source['timestamp']) {
-    var docTimestamp = moment.utc(data._source['timestamp']);
+  if (data._source['doc_timestamp']) {
+    var docTimestamp = moment.utc(data._source['doc_timestamp']);
     var hour = docTimestamp.hours();
     data._source['sys_timestamp'] = new Date().toISOString();
     data._source["date_timestamp"] = docTimestamp.format('YYYY-MM-DDT00:00:00.000') + 'Z';

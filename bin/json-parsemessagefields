@@ -22,12 +22,12 @@ process.stdin
   .pipe(process.stdout);
 
 function parseMessageFields(data) {
-  var reg =new RegExp('.*时间\\[\([0-9ZT:.+-]*\)\\]');
+  var reg =new RegExp('.*\,时间\\[\([0-9ZT:.+-]*\)\\]');
   //var timestamp = reg.exec(data._source['message']);
   if (reg.test(data._source['message'])) {
     var timestamp = data._source['message'].match(reg)[1];
     data._source['timestamp'] = timestamp;
   }
-  
+
   this.push(data);
 }

@@ -1,0 +1,45 @@
+#!/usr/bin/env node
+/**
+ * LambdaCloud copyright 2015.
+ *
+ */
+
+var program = require('commander');
+var _ = require('lodash');
+var jsonStream = require("json-stream");
+var eventStream = require('event-stream');
+var moment = require('moment');
+
+//use stream, jsonAddField to pipe data to standard output
+var lambdaUtil = require('../lambda-util');
+var stream = jsonStream();
+var jsonLine = new lambdaUtil.JsonLine();
+
+
+// use pipe deal with the data from standard in
+process.stdin
+  .pipe(stream)
+  .pipe(eventStream.through(jsonCheckDateIndex))
+  .pipe(jsonLine)
+  .pipe(process.stdout);
+
+
+function jsonCheckDateIndex(data) {
+
+  var index = data._index;
+  var position = index.indexOf('@');
+  //check the position & fix data
+  if (position > 0) {
+    var mySubIndex = index.substring(position+1);
+    if (mySubIndex != data._source['date']) {
+      //if you want to check, then you can get a error message
+      //console.log("error happed: " + mySubIndex + "date: " + data._source['date']);
+      //console.log(JSON.stringify(data));
+
+      //update the data._index
+      data._index = index.substring(0, position+1) + data._source['date'];
+    }
+  }
+
+  this.push(data);
+}
