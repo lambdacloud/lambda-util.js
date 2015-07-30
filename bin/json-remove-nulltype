@@ -1,0 +1,38 @@
+#!/usr/bin/env node
+/**
+ * LambdaCloud copyright 2015.
+ *
+ */
+var program = require('commander');
+var _ = require('lodash');
+var jsonStream = require("json-stream");
+var eventStream = require('event-stream');
+
+//use stream, jsonAddUserid to pipe data to standard output
+var lambdaUtil = require('../lambda-util');
+var stream = jsonStream();
+var jsonLine = new lambdaUtil.JsonLine();
+
+
+// use pipe deal with the data from standard in
+process.stdin
+  .pipe(stream)
+  .pipe(eventStream.through(jsonRemoveNullType))
+  .pipe(jsonLine)
+  .pipe(process.stdout);
+
+function jsonRemoveNullType(data) {
+
+  //if data from fore-end, then add 'user_id' & '#user_id', remain '用户ID', '#用户ID'
+  if (data._type === 'nulltype') {
+    data._source['日志类型'] = data._source['\"日志类型'];
+    delete data._source['\"日志类型'];
+    data._type = data._source['日志类型'];
+
+    //construct a reg to get the right message
+    var pureMessage = JSON.parse(data._source['message']).message;
+    data._source['message'] = pureMessage.substring(0, pureMessage.length-1);
+  }
+
+  this.push(data);
+}

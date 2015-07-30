@@ -30,7 +30,7 @@ function jsonCheckDateIndex(data) {
   var position = index.indexOf('@');
   //check the position & fix data
   if (position > 0) {
-    var mySubIndex = index.substring(position+1);
+    var mySubIndex = index.substring(position + 1);
     if (mySubIndex != data._source['date']) {
       //if you want to check, then you can get a error message
       //console.log("error happed: " + mySubIndex + "date: " + data._source['date']);
