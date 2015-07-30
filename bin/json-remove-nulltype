@@ -23,13 +23,13 @@ process.stdin
 
 function jsonRemoveNullType(data) {
 
-  //if data from fore-end, then add 'user_id' & '#user_id', remain '用户ID', '#用户ID'
+  //if data._type === nulltype, then fix it
   if (data._type === 'nulltype') {
     data._source['日志类型'] = data._source['\"日志类型'];
     delete data._source['\"日志类型'];
     data._type = data._source['日志类型'];
 
-    //construct a reg to get the right message
+    //construct a json, then get the json.message
     var pureMessage = JSON.parse(data._source['message']).message;
     data._source['message'] = pureMessage.substring(0, pureMessage.length-1);
   }
