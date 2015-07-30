@@ -30,8 +30,7 @@ function jsonRemoveNullType(data) {
     data._type = data._source['日志类型'];
 
     //construct a json, then get the json.message
-    var pureMessage = JSON.parse(data._source['message']).message;
-    data._source['message'] = pureMessage.substring(0, pureMessage.length-1);
+    data._source['message'] = JSON.parse(data._source['message']).message;
   }
 
   this.push(data);
