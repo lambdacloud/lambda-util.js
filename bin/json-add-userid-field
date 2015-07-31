@@ -25,10 +25,8 @@ function jsonAddUserId(data) {
 
   //if data has a field '用户ID', then add 'user_id' & '#user_id', remove '用户ID', '#用户ID'
   if (data._source['用户ID']) {
-    var userId = data._source['用户ID'];
-    var userIdWithPound = data._source['#用户ID'];
-    data._source['user_id'] = userId;
-    data._source['#user_id'] = userIdWithPound;
+    data._source['user_id'] = data._source['用户ID'];
+    data._source['#user_id'] = data._source['#用户ID'];
     delete data._source['用户ID'];
     delete data._source['#用户ID'];
   }
