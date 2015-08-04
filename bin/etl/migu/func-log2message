@@ -1,0 +1,112 @@
+#!/usr/bin/env node
+
+/**
+ * LambdaCloud copyright 2015.
+ *
+ * The tool to convert migu function log to lambdacloud format message
+ * It support the stdin for input stream and output to the stdout
+ *
+ */
+'use strict';
+
+var _ = require('lodash');
+var eventStream = require('event-stream');
+var format = require('string-template');
+var moment = require('moment');
+var flatten = require('flat');
+var byline = require('byline');
+var lineTrans = new byline.LineStream();
+
+// use pipe deal with the data from standard in
+// and output the result to stdout
+process.stdin
+  .pipe(lineTrans)
+  .pipe(eventStream.through(removeLineEnding))
+  .pipe(eventStream.through(parseFunction))
+  .pipe(process.stdout);
+
+var selectedControllers = ['lingshi', 'anhei'];
+var selectedOperations = ['orderAndPay', 'buyConfirm'];
+
+var buf = '';
+
+function removeLineEnding(data) {
+  var line = String(data);
+
+  if (_.endsWith(line, '-')) {
+    buf = line;
+  } else {
+    this.emit('data', buf + line);
+  }
+}
+
+function parseFunction(data) {
+  var regex = /(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d\.\d{3}) .*-\s*(\w+)\s([\w.]*)\(.*\)\|\|\|(.+)\|\|(.*)/i;
+
+  if (regex.test(data)) {
+    var found = data.match(regex);
+    var functionName = found[3];
+    var functionInfo = getFunctionNameInfo(functionName);
+
+    // Only get selected function controllers and operations
+    if (_.all(selectedControllers, function(v) { return v !== functionInfo.controller; }) ||
+        _.all(selectedOperations, function(v) { return v !== functionInfo.operation; })) {
+      return;
+    }
+
+    var params = found[4];
+    var paramsInfo = getParamsInfo(params);
+
+    var result = JSON.parse(found[5]);
+    if (result.content.product) {
+      delete result.content.product.extraInfo;
+    }
+
+    var info = {
+      '时间': moment(found[1]).format(),
+      '日志类型': functionInfo.operation.toLowerCase(),
+      returnType: found[2],
+      functionName: functionName,
+      params: found[4]
+    };
+
+    var flattenResult = flatten({ result: result }, { delimiter: '_' });
+    info = _.assign(info, functionInfo, paramsInfo, flattenResult);
+
+    // Lambdacloud message format is: k[v]
+    var messageSegments = _.map(info, function(v, k) { return format('{0}[{1}]', k, v); });
+
+    var message = messageSegments.join(',') + '\n';
+    this.emit('data', message);
+  }
+}
+
+function getFunctionNameInfo(functionName) {
+  var regex = /com\.migu\.platform\.\w+.\w+\.controller\.(\w+)\.(\w+)\.(\w+)/i;
+
+  if (regex.test(functionName)) {
+    var found = functionName.match(regex);
+
+    return {
+      controller: found[1],
+      opController: found[2],
+      operation: found[3]
+    };
+  }
+
+  return {};
+}
+
+function getParamsInfo(params) {
+  var regex = /([\w-]+)\|?/i;
+
+  if (regex.test(params)) {
+    var found = params.match(regex);
+
+    return {
+      sessionId: found[1]
+    };
+  }
+
+  return {};
+}
