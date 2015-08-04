@@ -41,7 +41,7 @@ function removeLineEnding(data) {
 }
 
 function parseFunction(data) {
-  var regex = /(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d\.\d{3}) .*-\s*(\w+)\s([\w.]*)\(.*\).*\|\|\|(.*)\|\|(.*)/i;
+  var regex = /(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d\.\d{3}) .*-\s*(\w+)\s([\w.]*)\(.*\)\|\|\|(.+)\|\|(.*)/i;
 
   if (regex.test(data)) {
     var found = data.match(regex);
