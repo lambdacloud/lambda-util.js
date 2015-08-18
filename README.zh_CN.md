@@ -9,8 +9,11 @@
 3. 使用 `git`, 将代码克隆到本地
        git clone https://github.com/lambdacloud/lambda-util.js.git
 4. 进入 `lambda-util.js` 目录，运行 `npm install` 安装工具的依赖包
-       $ cd lambda-util.js
-       $ npm install
+
+  ```
+  $ cd lambda-util.js
+  $ npm install
+```
 5. 依赖包安装完毕后，就可以使用了，所有可执行脚本都位于 `bin` 目录下
 
 # 工具列表
