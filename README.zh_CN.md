@@ -9,8 +9,11 @@
 3. 使用 `git`, 将代码克隆到本地
        git clone https://github.com/lambdacloud/lambda-util.js.git
 4. 进入 `lambda-util.js` 目录，运行 `npm install` 安装工具的依赖包
-       $ cd lambda-util.js
-       $ npm install
+
+  ```
+  $ cd lambda-util.js
+  $ npm install
+```
 5. 依赖包安装完毕后，就可以使用了，所有可执行脚本都位于 `bin` 目录下
 
 # 工具列表
@@ -54,9 +57,55 @@ $ bin/elastic2json --help
   $ bin/elastic2json --host 10.9.0.1:9200 --indices logstash-2015.03.03 > log.json
 ```
 
+### elastic2csv
+
+将 Elastic 的数据以 csv 格式导出。csv 格式的数据会被输出到控制台标准输出。并且首行是每个列的名称。如果需要以磁盘文件格式存储，可以使用 shell 的重定向功能完成。
+
+#### 命令
+    bin/elastic2csv -H <ElasticHost:[port]> -i <ElasticIndex> [options]
+
+#### 参数列表
+
+```
+$ bin/elastic2csv --help
+
+  Usage: elastic2csv [options]
+
+  Options:
+
+    -h, --help                                             output usage information
+    -V, --version                                          output the version number
+    -H, --host <Elastic Host>                              Specify Elasticsearch host and port, default: localhost:9200
+    -D, --debug                                            Enable Debugging
+    -i, --indices <Elastic indices>                        Specify indices
+    -q, --query <Elastic query>                            Specify query
+    -t, --type <Elastic type>                              Specify type
+    -c, --columns <columns to export, seprated by commas>  Specify the columns of csv, by default all.
+    --api <version>                                        Specify Elasticsearch API version, such as, 1.1, 1.2, 1.3, default: 1.4.
+```
+
+#### 示例
+1. 将本地 Elastic 服务（服务端口为9200）的 fooindex 索引的数据以 CSV 格式导出，输出到控制台标准输出
+ ```
+  $ bin/elastic2csv --host localhost:9200 --indices fooindex
+```
+
+2. 将 IP 地址为 10.9.0.1，端口为9200的 Elastic 服务的 logstash-2015.03.03 索引数据以 CSV 格式导出到磁盘文件 log.csv
+ ```
+  $ bin/elastic2csv --host 10.9.0.1:9200 --indices logstash-2015.03.03 > log.csv
+```
+
+3. 将地址为 es.cluster.ldp，端口为19200的 Elastic 服务的 logstash-2015.03.03 索引数据，其中 type 为 login，选取其中的 user_id 列和 doc_timestamp 列 以 CSV 格式导出到磁盘文件 log.csv
+ ```
+  $ bin/elastic2csv --host es.cluster.ldp:19200 --indices logstash-2015.03.03 --type login --columns user_id,doc_timestamp > log.csv
+```
+
 ## LambdaCloud 相关工具
 
 此类工具是和览云共有云服务相关工具，提供日志的上载等相关服务。
+
+### line2lambdacloud
+此命令是用来方便的将日志上传到 Lambdacloud 的服务之中。
 
 #### 命令
     bin/line2lambdacloud --token <user_token>
