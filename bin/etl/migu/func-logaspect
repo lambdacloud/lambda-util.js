@@ -56,9 +56,21 @@ function parseFunction(data) {
     //     _.all(selectedOperations, function(v) { return v !== functionInfo.operation; })) {
     //   return;
     // }
+    if(functionInfo.operation == 'productDetail') {
 
-    var params = found[6];
-    var paramsInfo = getParamsInfo(params);
+      var regexprouctDetail =/(\w+-\d+-\d+)\|(\w+)/i;
+      var params = found[6];
+      if(regexprouctDetail.test(params)) {
+         var foundProductDetail = params.match(regexprouctDetail);
+         var paramsInfo = {};
+         paramsInfo['token'] = foundProductDetail[1];
+         paramsInfo['productid'] = foundProductDetail[2];
+      }
+    } else {
+      var params = found[6];
+      var paramsInfo = getParamsInfo(params);
+    }
+
     try {
       if (returnType == 'Result') {
         var result = JSON.parse(found[7]);
