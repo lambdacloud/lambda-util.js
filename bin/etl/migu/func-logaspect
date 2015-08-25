@@ -25,9 +25,6 @@ process.stdin
   .pipe(eventStream.through(parseFunction))
   .pipe(process.stdout);
 
-// var selectedControllers = ['lingshi', 'anhei'];
-// var selectedOperations = ['orderAndPay', 'buyConfirm'];
-
 var buf = '';
 
 function removeLineEnding(data) {
@@ -43,11 +40,9 @@ function removeLineEnding(data) {
 
 function parseFunction(data) {
   var regex = /(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d\.\d{3})\s(\[.*\])\sINFO\s\s(.*)\s-\s*(\w+)\s([\w.]*)\(.*\)\|\|\|(.+?)\|\|(.*)/i;
-  data=data.replace(/\\r\\n/g,"");
-  data=data.replace(/\\n/g,"");
+  data = data.replace(/\\r\\n/g,"");
+  data = data.replace(/\\n/g,"");
   if (regex.test(data)) {
-
-
 
     var found = data.match(regex);
     var proces = getHttpNio(found[2]);
@@ -65,12 +60,12 @@ function parseFunction(data) {
     var params = found[6];
     var paramsInfo = getParamsInfo(params);
     try {
-      if(returnType == 'Result') {
+      if (returnType == 'Result') {
         var result = JSON.parse(found[7]);
         if (result.content.product) {
           delete result.content.product.extraInfo;
         }
-      }else if(returnType == 'Map'){
+      }else if (returnType == 'Map'){
         var result = getMapResult(found[7]);
       }else {
         var result = found[7];
@@ -79,8 +74,8 @@ function parseFunction(data) {
       var result = {};
       result['result'] = '';
     }
-    //var result = JSON.parse(found[7]);
 
+    //var result = JSON.parse(found[7]);
 
     var info = {
       '时间': moment(found[1]).format(),
@@ -138,7 +133,7 @@ function getParamsInfo(params) {
 
   
     var regexMap = /\{[\w-]+\=[\w-]+.*\}/g;
-    if(regexMap.test(params)) {
+    if (regexMap.test(params)) {
       var tokenMap = getMapResult(params);
       return tokenMap;
     }
@@ -161,7 +156,7 @@ function getParamsInfo(params) {
       return params;
     }
     var regexToken = /(\w+-\d+-\d+)/g;
-    if(regexToken.test(params)) {
+    if (regexToken.test(params)) {
       var found = params.match(regexToken);
       var token = {};
       token['token'] = found[0];
