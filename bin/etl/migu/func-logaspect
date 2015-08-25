@@ -42,7 +42,8 @@ function removeLineEnding(data) {
 }
 
 function parseFunction(data) {
-  var regex = /(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d\.\d{3})\s(\[.*\])\sINFO\s\s(.*)\s-\s*(\w+)\s([\w.]*)\(.*\)\|\|\|(.+)\|\|(.*)/i;
+  var regex = /(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d\.\d{3})\s(\[.*\])\sINFO\s\s(.*)\s-\s*(\w+)\s([\w.]*)\(.*\)\|\|\|(.+?)\|\|(.*)/i;
+  data=data.replace(/\\r\\n/g,"");
   data=data.replace(/\\n/g,"");
   if (regex.test(data)) {
 
@@ -83,7 +84,7 @@ function parseFunction(data) {
 
     var info = {
       '时间': moment(found[1]).format(),
-      '日志类型': (found[3]+'_'+functionName).toLowerCase(),
+      '日志类型': (found[3]+'_'+functionInfo.controllerType+'.'+functionInfo.operation).toLowerCase(),
       process : proces,
       logController:found[3],
       returnType:found[4],
@@ -110,21 +111,21 @@ function getFunctionNameInfo(functionName) {
     var found = functionName.match(regex);
     if (found[3].size == 0) {
       return {
-        controller: found[1],
-        opController: found[2],
+        gameEnd: found[1],
+        controllerType: found[2],
         operation: cfg 
       };
     }
     if (found[4].size > 0) {
       return {
-        controller: found[1],
-        opController: found[2],
+        gameEnd: found[1],
+        controllerType: found[2],
         operation: found[4] 
       };
     }
     return {
-      controller: found[1],
-      opController: found[2],
+      gameEnd: found[1],
+      controllerType: found[2],
       operation: found[3] 
     };
   }
@@ -134,21 +135,16 @@ function getFunctionNameInfo(functionName) {
 
 //clear params
 function getParamsInfo(params) {
-  try {
+
+  
     var regexMap = /\{[\w-]+\=[\w-]+.*\}/g;
     if(regexMap.test(params)) {
       var tokenMap = getMapResult(params);
       return tokenMap;
     }
-    var  regexJson = /\{.*\:.*\}/g;
     
-    if (regexJson.test(params)) {
-      var found = params.match(regexJson);
-      var params = JSON.parse(found);
-      return params;
-    }
 
-    var regexTokenJson = /([\w-]+)\|(\{.*\:.*\})/g;
+    var regexTokenJson = /(\w+-\d+-\d+)\|(\{.*\:.*\})/i;
    
     if (regexTokenJson.test(params)) {
       var found = params.match(regexTokenJson);
@@ -157,22 +153,25 @@ function getParamsInfo(params) {
       return paramJson;
     }
 
-    var regexToken = /([\w-]+\-[\w-]+\-[\w-]+)\|?/i;
-
+    var  regexJson = /\{.*\:.*\}/g;
+    
+    if (regexJson.test(params)) {
+      var found = params.match(regexJson);
+      var params = JSON.parse(found);
+      return params;
+    }
+    var regexToken = /(\w+-\d+-\d+)/g;
     if(regexToken.test(params)) {
-      var found = params.match(params);
-      var tokenJson = {};
-      tokenJson['token'] = found[1];
-      return tokenJson;
+      var found = params.match(regexToken);
+      var token = {};
+      token['token'] = found[0];
+      return token;
     }
 
     var result = {};
     result['params'] = params;
     return result;
-  }catch (params) {
-     var result = {};
-    result['params'] = '';
-  }
+ 
 }
 
 //sub process
