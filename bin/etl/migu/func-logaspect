@@ -87,8 +87,6 @@ function parseFunction(data) {
       result['result'] = '';
     }
 
-    //var result = JSON.parse(found[7]);
-
     var info = {
       '时间': moment(found[1]).format(),
       '日志类型': (found[3]+'_'+functionInfo.controllerType+'.'+functionInfo.operation).toLowerCase(),
@@ -101,8 +99,7 @@ function parseFunction(data) {
     var flattenResult = flatten({ result: result }, { delimiter: '_' });
     var flattenParams = flatten({params:paramsInfo},{delimiter: '_' });
     info = _.assign(info, functionInfo, flattenParams, flattenResult);
-
-    // Lambdacloud message format is: k[v]
+  
     var messageSegments = _.map(info, function(v, k) { return format('{0}[{1}]', k, v); });
 
     var message = messageSegments.join(',') + '\n';
@@ -136,20 +133,17 @@ function getFunctionNameInfo(functionName) {
       operation: found[3] 
     };
   }
-
   return {};
 }
 
 //clear params
 function getParamsInfo(params) {
 
-  
     var regexMap = /\{[\w-]+\=[\w-]+.*\}/g;
     if (regexMap.test(params)) {
       var tokenMap = getMapResult(params);
       return tokenMap;
     }
-    
 
     var regexTokenJson = /(\w+-\d+-\d+)\|(\{.*\:.*\})/i;
    
@@ -174,11 +168,9 @@ function getParamsInfo(params) {
       token['token'] = found[0];
       return token;
     }
-
     var result = {};
     result['params'] = params;
     return result;
- 
 }
 
 //sub process
@@ -197,7 +189,6 @@ function getMapResult(result) {
     var kv = unit.split('=');
     result[kv[0]] = kv[1];
   })
-  
   return result;
 }
 
