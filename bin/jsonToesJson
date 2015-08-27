@@ -1,0 +1,52 @@
+#!/usr/bin/env node
+/**
+ * LambdaCloud copyright 2015.
+ * spiltJson to jsons
+ */
+var program = require('commander');
+var _ = require('lodash');
+var jsonStream = require("json-stream");
+var eventStream = require('event-stream');
+
+//use stream, jsonAddOrigin to pipe data to standard output
+var lambdaUtil = require('../lambda-util');
+var stream = jsonStream();
+var jsonLine = new lambdaUtil.JsonLine();
+
+// use pipe deal with the data from standard in
+process.stdin
+  .pipe(stream)
+  .pipe(eventStream.through(jsonChange))
+  .pipe(jsonLine)
+  .pipe(process.stdout);
+
+function jsonChange(data) {
+
+  var source = data._source;
+  var array = [];
+  for (var i in source) {
+    array.push(i);
+  }
+
+  var regex = /result\_content\_datas\_(\d+)\_(\w+)/i;
+  var result = [];
+  for(var i=0; i<array.length; i++) {
+    if (regex.test(array[i])) {
+      var key = array[i];
+      var found = key.match(regex);
+      var jsonindex = found[1];
+      var field = found[2];
+      if(!result[jsonindex]) {
+        result[jsonindex] ={};
+      }
+      result[jsonindex][field] = source[key];
+    }
+  }
+  for (var i = 0; i < result.length; i++) {
+    if(result[i]) {
+    this.push(result[i]);
+    }
+  }
+}
+
+  
