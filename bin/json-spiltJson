@@ -44,7 +44,8 @@ function jsonChange(data) {
   }
   for (var i = 0; i < result.length; i++) {
     if(result[i]) {
-    this.push(result[i]);
+      delete result[i]['extraInfo'];
+      this.push(result[i]);
     }
   }
 }
