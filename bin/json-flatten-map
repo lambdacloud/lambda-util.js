@@ -1,0 +1,59 @@
+#!/usr/bin/env node
+/**
+ * LambdaCloud copyright 2015.
+ *
+ */
+var fs = require('fs');
+var program = require('commander');
+var _ = require('lodash');
+var jsonStream = require("json-stream");
+var eventStream = require('event-stream');
+var util = require('util');
+
+var lambdaUtil = require('../lambda-util');
+var stream = jsonStream();
+var jsonLine = new lambdaUtil.JsonLine();
+
+// commented line is for debug
+//var readFile = fs.createReadStream("../json.txt")
+
+process.stdin
+  .pipe(stream)
+  .pipe(eventStream.through(flattenMap))
+  .pipe(jsonLine)
+  .pipe(process.stdout);
+
+function flattenMap(data) {
+
+  // flatten map according to log type
+  if (data._type) {
+    // flatten server name map
+    if (data._type == '登陆游戏' || data._type == '充值成功' || data._type == '获取订单') {
+      if (data._source['message']) {
+
+        // only accept one kay value pair for server name
+        var message = data._source['message'];
+
+        // some log has square bracket on the right side
+        // example: 服务器{1:Bialya]
+        var pattern = /服务器{([^}\]]*)\:([^}\]]*)(}|\])/i;
+        if (!pattern.test(message)) {
+          var err = new Error(util.format('日志中找不到服务器字段或者服务器字段不符合格式, detail: %s, pattern: %s', JSON.stringify(data), pattern));
+          throw err;
+        }
+
+        // update data
+        var found = message.match(pattern);
+        data._source['服务器ID'] = found[1];
+        data._source['服务器名称'] = found[2]
+
+        // try to cast string value to int
+        if (parseInt(found[1])) {
+          data._source['#服务器ID'] = parseInt(found[1])
+        }
+      }
+    }
+  }
+
+  this.push(data);
+}
