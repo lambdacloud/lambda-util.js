@@ -25,7 +25,7 @@ process.stdin
 function parseToken(data) {
 	var source = data._source;
 	var sourceStr = JSON.stringify(source);
-	var regex = /token[\"]?:[ ]?[\"]?(\w+)-(\d+)-(\d+)[\"]?/i;
+	var regex = /token[\"]?:[ ]?[\"]?(\w+)-(\d+)-(\d+)[\"]?\,/i;
 	if(regex.test(sourceStr)) {
 		var token = sourceStr.match(regex);
 		var userid = token[2];
