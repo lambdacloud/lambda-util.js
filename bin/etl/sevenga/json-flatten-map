@@ -10,7 +10,7 @@ var jsonStream = require("json-stream");
 var eventStream = require('event-stream');
 var util = require('util');
 
-var lambdaUtil = require('../lambda-util');
+var lambdaUtil = require('../../../lambda-util');
 var stream = jsonStream();
 var jsonLine = new lambdaUtil.JsonLine();
 
