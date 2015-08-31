@@ -8,7 +8,7 @@ var _ = require('lodash');
 var jsonStream = require("json-stream");
 var eventStream = require('event-stream');
 var moment = require('moment');
-
+var util = require('util');
 //use stream, jsonAddField to pipe data to standard output
 var lambdaUtil = require('../../../lambda-util');
 var stream = jsonStream();
@@ -26,10 +26,16 @@ function parseToken(data) {
 	var source = data._source;
 	var sourceStr = JSON.stringify(source);
 	var regex = /token[\"]?:[ ]?[\"]?(\w+)-(\d+)-(\d+)[\"]?\,/i;
-	if(regex.test(sourceStr)) {
+	if (regex.test(sourceStr)) {
 		var token = sourceStr.match(regex);
 		var userid = token[2];
 		var roleid = token[3];
+		if (source['userid']) {
+			if ( userid != source['userid']) {
+				var err = new Error(util.format('日志中找不到服务器字段或者服务器字段不符合格式, detail: %s, pattern: %s', JSON.stringify(data), regex));
+          		throw err;
+			}
+		}
 		source['userid'] = userid;
 		source['roleid'] = roleid;
 	}
