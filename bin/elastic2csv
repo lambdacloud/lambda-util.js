@@ -23,6 +23,9 @@ program.version('0.1.0')
 _.forEach(['indices'], function (opt) {
   assert(program[opt], '--' + opt + ' is missing, exit.');
 });
+_.forEach(['type'], function (opt) {
+  assert(program[opt], '--' + opt + ' is missing, exit.');
+});
 
 var esLogLevel = 'warning';
 if (program.debug) {
@@ -39,17 +42,29 @@ var elastic = new lambdaUtil.ElasticPipe({
   keepAlive: false
 }, program.indices, program.type, program.query);
 
-var elasticDocFlat = new lambdaUtil.ElasticDocFlat();
-var stringify = require('csv-stringify');
-
-var columns = program.columns ? program.columns.split(',') : undefined;
-var stringifyOption = _.merge({ header: true }, { columns: columns });
-
-var stringifier = stringify(stringifyOption);
 var arrayTrans = new lambdaUtil.ArrayTrans();
+var stringify = require('csv-stringify');
+var elasticDocFlat = new lambdaUtil.ElasticDocFlat();
 
-elastic
-  .pipe(arrayTrans)
-  .pipe(elasticDocFlat)
-  .pipe(stringifier)
-  .pipe(process.stdout);
+function init(cb) {
+  new lambdaUtil.ElasticMappings().map({
+    host: program.host,
+    log: esLogLevel,
+    keepAlive: false
+  }, program.indices, program.type, program.query, cb);
+}
+
+var cb = function(mappingKeys) {
+
+  var columns = program.columns ? program.columns.split(',') : mappingKeys;
+  var stringifyOption = _.merge({ header: true }, { columns: columns });
+  var stringifier = stringify(stringifyOption);
+
+  elastic
+    .pipe(arrayTrans)
+    .pipe(elasticDocFlat)
+    .pipe(stringifier)
+    .pipe(process.stdout);
+};
+
+init(cb);

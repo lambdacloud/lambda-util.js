@@ -1,5 +1,6 @@
 exports.ArrayTrans = require('./lib/array-trans');
 exports.ElasticPipe = require('./lib/elastic/elastic-pipe');
+exports.ElasticMappings = require('./lib/elastic/elastic-mappings');
 exports.ElasticDocFlat = require('./lib/elastic/elastic-docflat-trans');
 exports.JsonLine = require('./lib/jsonline-trans');
 exports.SetsPlus = require('./lib/sets-plus');
