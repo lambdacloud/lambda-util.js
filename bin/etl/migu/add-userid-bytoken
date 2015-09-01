@@ -39,6 +39,10 @@ function parseToken(data) {
 		data._source = {};
 		data._source['userid'] = userid;
 		data._source['roleid'] = roleid;
+		if(parseInt(userid)&&parseInt(roleid)) {
+			data._source['#userid'] = parseInt(userid);
+			data._source['#roleid'] = parseInt(roleid);			
+		}
 		this.push(data);
 	}
 	
