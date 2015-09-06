@@ -23,9 +23,6 @@ program.version('0.1.0')
 _.forEach(['indices'], function (opt) {
   assert(program[opt], '--' + opt + ' is missing, exit.');
 });
-_.forEach(['type'], function (opt) {
-  assert(program[opt], '--' + opt + ' is missing, exit.');
-});
 
 var esLogLevel = 'warning';
 if (program.debug) {
@@ -55,7 +52,6 @@ function init(cb) {
 }
 
 var cb = function(mappingKeys) {
-
   var columns = program.columns ? program.columns.split(',') : mappingKeys;
   var stringifyOption = _.merge({ header: true }, { columns: columns });
   var stringifier = stringify(stringifyOption);
