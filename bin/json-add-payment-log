@@ -1,0 +1,46 @@
+#!/usr/bin/env node
+/**
+ * LambdaCloud copyright 2015.
+ * This is designed for sevenga recharge log import 0624-0803 -- pay.json
+ * after execute it, you should get other time field use json-add-other-time-field
+ */
+var program = require('commander');
+var _ = require('lodash');
+var sourceJosn = require('../pay');
+var hitsInput = sourceJosn.hits.hits;
+
+getlog(hitsInput);
+
+function getlog(hitsInput) {
+  _.map(hitsInput, function(hit) {
+    //console.log("hit: " + JSON.stringify(hit));
+    var index = hit['_index'];
+    //console.log(index);
+    var pos = index.indexOf('-');
+    hit['_index'] = 'sevenga.ironcommander@' + index.substring(pos+1, pos+5) + '-' + index.substring(pos+6, pos+8) + '-' + index.substring(pos+9);
+    hit['_type'] = hit['_source']['日志类型'];
+    hit['_score'] = 0;
+    var source = hit['_source'];
+    source['message'] = '日志类型[' + source['日志类型'] + '],时间[' + source['时间'] + '],服务器{' + source['服务器'] + '],用户ID[' + source['用户ID'] + '],用户昵称[' + source['用户昵称'] + '],订单号[' + source['订单号'] + '],商品ID[' + source['商品ID'] + '],商品价格[' + source['商品价格'] + ']';
+    source['user_id'] = source['用户ID'];
+    source['log_type'] = source['日志类型'];
+    source['#user_id'] = parseInt(source['用户ID']);
+    source['#商品ID'] = parseInt(source['商品ID']);
+    source['#商品价格'] = parseFloat(source['商品价格']);
+    source['corporation'] = "sevenga";
+    source['来源'] = '服务器';
+    delete source['用户ID'];
+    delete source['type'];
+    delete source['时间'];
+    delete source['日志类型'];
+    delete source['服务器'];
+
+    source['doc_timestamp'] = source['@timestamp'];
+    delete source['@timestamp'];
+  });
+
+  _.forEach(hitsInput, function(hit) {
+    console.log(JSON.stringify(hit));
+  });
+
+}
