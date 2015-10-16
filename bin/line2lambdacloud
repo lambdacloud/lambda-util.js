@@ -11,7 +11,8 @@ var byline = require('byline');
 var eventStream = require('event-stream');
 
 // Get command line arguments, now is form standard input
-program.version('0.1.2')
+program.version('0.2.1')
+  .option('-H, --host <Front End Host>', 'Specify front end host and port, default: localhost:3000', 'localhost:3000')
   .option('-D, --debug', 'Enable Debugging')
   .option('-P, --proxy <http proxy>', 'Set proxy')
   .option('-B, --batch <batch size>', 'Set http uploading request batch size, by default: 64', 64)
@@ -24,7 +25,7 @@ if (program.debug) {
 }
 
 var lambdaUtil = require('../lambda-util');
-var lambdaUploader = new lambdaUtil.LambdacloudUploader({ token: program.token, proxy: program.proxy });
+var lambdaUploader = new lambdaUtil.LambdacloudUploader({ host: program.host, token: program.token, proxy: program.proxy });
 var linestream = new byline.LineStream();
 var elasticBulkArray = new lambdaUtil.ElasticBulkArray(program.batch);
 
