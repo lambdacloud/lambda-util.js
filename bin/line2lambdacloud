@@ -11,7 +11,7 @@ var byline = require('byline');
 var eventStream = require('event-stream');
 
 // Get command line arguments, now is form standard input
-program.version('0.2.1')
+program.version('0.2.2')
   .option('-H, --host <Front End Host>', 'Specify front end host and port, default: api.lambdacloud.com', 'api.lambdacloud.com')
   .option('-D, --debug', 'Enable Debugging')
   .option('-P, --proxy <http proxy>', 'Set proxy')
