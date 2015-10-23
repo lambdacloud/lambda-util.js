@@ -6,7 +6,7 @@
 
 'use strict';
 
-var assert = ('assert');
+var assert = require('assert');
 var program = require('commander');
 var byline = require('byline');
 var eventStream = require('event-stream');
