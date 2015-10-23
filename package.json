@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/lambdacloud/lambda-util.js",
   "dependencies": {
+    "assert": "^1.3.0",
     "byline": "^4.2.1",
     "commander": "^2.7.1",
     "csv-stringify": "0.0.6",

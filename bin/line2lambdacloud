@@ -6,9 +6,11 @@
 
 'use strict';
 
+var assert = require('assert');
 var program = require('commander');
 var byline = require('byline');
 var eventStream = require('event-stream');
+var _ = require('lodash');
 
 // Get command line arguments, now is form standard input
 program.version('0.2.3')
