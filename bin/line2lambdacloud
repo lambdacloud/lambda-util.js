@@ -11,7 +11,7 @@ var byline = require('byline');
 var eventStream = require('event-stream');
 
 // Get command line arguments, now is form standard input
-program.version('0.2.2')
+program.version('0.2.3')
   .option('-H, --host <Front End Host>', 'Specify front end host and port, default: api.lambdacloud.com', 'api.lambdacloud.com')
   .option('-D, --debug', 'Enable Debugging')
   .option('-P, --proxy <http proxy>', 'Set proxy')
@@ -23,6 +23,11 @@ if (program.debug) {
   var debug = require('debug');
   debug.enable('lambdacloud-uploader:debug');
 }
+
+// Required options
+_.forEach(['token'], function (opt) {
+  assert(program[opt], '--' + opt + ' is missing, exit.');
+});
 
 var lambdaUtil = require('../lambda-util');
 var lambdaUploader = new lambdaUtil.LambdacloudUploader({ host: program.host, token: program.token, proxy: program.proxy });
