@@ -29,7 +29,7 @@ var lambdaUploader = new lambdaUtil.LambdacloudUploader({ host: program.host, to
 var linestream = new byline.LineStream();
 var elasticBulkArray = new lambdaUtil.ElasticBulkArray(program.batch);
 
-//process.stdin.setEncoding('utf8');
+process.stdin.setEncoding('utf8');
 
 process.stdin
   .pipe(linestream)
