@@ -24,6 +24,11 @@ if (program.debug) {
   debug.enable('lambdacloud-uploader:debug');
 }
 
+// Required options
+_.forEach(['token'], function (opt) {
+  assert(program[opt], '--' + opt + ' is missing, exit.');
+});
+
 var lambdaUtil = require('../lambda-util');
 var lambdaUploader = new lambdaUtil.LambdacloudUploader({ host: program.host, token: program.token, proxy: program.proxy });
 var linestream = new byline.LineStream();
