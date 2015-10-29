@@ -7,6 +7,7 @@
 'use strict';
 
 var assert = require('assert');
+var fs = require('fs');
 var program = require('commander');
 var eventStream = require('event-stream');
 var _ = require('lodash');
@@ -18,7 +19,9 @@ program.version('0.0.1')
   .option('-D, --debug', 'Enable Debugging')
   .option('-P, --proxy <http proxy>', 'Set proxy')
   .option('-B, --batch <batch size>', 'Set http uploading request batch size, by default: 64', 64)
+  .option('-s, --src <source from end>', 'set source from "服务器", "客户端", "数据库"')
   .option('-T, --token <token of lambdacloud>', 'Specify the token')
+  .option('-F, --file <file to read>', 'Specify the file to read')
   .parse(process.argv);
 
 if (program.debug) {
@@ -27,7 +30,7 @@ if (program.debug) {
 }
 
 // Required options
-_.forEach(['token'], function (opt) {
+_.forEach(['token', 'file'], function (opt) {
   assert(program[opt], '--' + opt + ' is missing, exit.');
 });
 
@@ -36,20 +39,23 @@ var lambdaUploader = new lambdaUtil.LambdacloudUploader({ host: program.host, to
 var elasticBulkArray = new lambdaUtil.ElasticBulkArray(program.batch);
 
 var parser = parse({delimiter: ',', columns: true});
+var stat = fs.statSync('./' + program.file);
+
 
 process.stdin.setEncoding('utf8');
 
 //use pipe handle rawdata into elasticsearch
-process.stdin
+fs.createReadStream('./' + program.file)
   .pipe(parser)
-  //.pipe(process.stdout);
   .pipe(eventStream.through(function(data) {
     var kv = [];
     _.forEach(data, function(value, key) {
       kv.push(key + '[' + value + ']');
     });
-
+    kv.push('来源' + '[' + program.src + ']');
+    kv.push('时间' + '[' + stat.ctime.toISOString() + ']');
     this.emit('data', String(kv));
   }))
+  //.pipe(process.stdout);
   .pipe(elasticBulkArray)
   .pipe(lambdaUploader);
