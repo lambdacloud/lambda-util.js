@@ -1,0 +1,55 @@
+#!/usr/bin/env node
+/**
+ * LambdaCloud copyright 2015.
+ *
+ */
+
+'use strict';
+
+var assert = require('assert');
+var program = require('commander');
+var eventStream = require('event-stream');
+var _ = require('lodash');
+var parse = require('csv-parse');
+
+// Get command line arguments, now is form standard input
+program.version('0.0.1')
+  .option('-H, --host <Front End Host>', 'Specify front end host and port, default: api.lambdacloud.com', 'api.lambdacloud.com')
+  .option('-D, --debug', 'Enable Debugging')
+  .option('-P, --proxy <http proxy>', 'Set proxy')
+  .option('-B, --batch <batch size>', 'Set http uploading request batch size, by default: 64', 64)
+  .option('-T, --token <token of lambdacloud>', 'Specify the token')
+  .parse(process.argv);
+
+if (program.debug) {
+  var debug = require('debug');
+  debug.enable('lambdacloud-uploader:debug');
+}
+
+// Required options
+_.forEach(['token'], function (opt) {
+  assert(program[opt], '--' + opt + ' is missing, exit.');
+});
+
+var lambdaUtil = require('../lambda-util');
+var lambdaUploader = new lambdaUtil.LambdacloudUploader({ host: program.host, token: program.token, proxy: program.proxy });
+var elasticBulkArray = new lambdaUtil.ElasticBulkArray(program.batch);
+
+var parser = parse({delimiter: ',', columns: true});
+
+process.stdin.setEncoding('utf8');
+
+//use pipe handle rawdata into elasticsearch
+process.stdin
+  .pipe(parser)
+  //.pipe(process.stdout);
+  .pipe(eventStream.through(function(data) {
+    var kv = [];
+    _.forEach(data, function(value, key) {
+      kv.push(key + '[' + value + ']');
+    });
+
+    this.emit('data', String(kv));
+  }))
+  .pipe(elasticBulkArray)
+  .pipe(lambdaUploader);
