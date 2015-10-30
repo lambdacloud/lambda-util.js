@@ -58,6 +58,8 @@ fs.createReadStream(program.file)
       kv.push('来源' + '[客户端]');
     } else if (program.src === 'sd') {
       kv.push('来源' + '[数据库]');
+    } else {
+      throw new Error("--src must be ss, sc or sd");
     }
     kv.push('时间' + '[' + stat.ctime.toISOString() + ']');
     this.emit('data', String(kv));
