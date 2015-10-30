@@ -19,9 +19,9 @@ program.version('0.0.1')
   .option('-D, --debug', 'Enable Debugging')
   .option('-P, --proxy <http proxy>', 'Set proxy')
   .option('-B, --batch <batch size>', 'Set http uploading request batch size, by default: 64', 64)
-  .option('-s, --src <source from end>', 'set source from "服务器", "客户端", "数据库"')
+  .option('-s, --src <source from end>', 'set source from ss("服务器"), sc("客户端"), sd("数据库")')
   .option('-T, --token <token of lambdacloud>', 'Specify the token')
-  .option('-F, --file <file to read>', 'Specify the file to read')
+  .option('-F, --file <file to read>', 'Specify the file to read, get the absoulate path to read')
   .parse(process.argv);
 
 if (program.debug) {
@@ -39,20 +39,26 @@ var lambdaUploader = new lambdaUtil.LambdacloudUploader({ host: program.host, to
 var elasticBulkArray = new lambdaUtil.ElasticBulkArray(program.batch);
 
 var parser = parse({delimiter: ',', columns: true});
-var stat = fs.statSync('./' + program.file);
+var stat = fs.statSync(program.file);
 
 
 process.stdin.setEncoding('utf8');
 
 //use pipe handle rawdata into elasticsearch
-fs.createReadStream('./' + program.file)
+fs.createReadStream(program.file)
   .pipe(parser)
   .pipe(eventStream.through(function(data) {
     var kv = [];
     _.forEach(data, function(value, key) {
       kv.push(key + '[' + value + ']');
     });
-    kv.push('来源' + '[' + program.src + ']');
+    if (program.src === 'ss') {
+      kv.push('来源' + '[服务器]');
+    } else if (program.src === 'sc') {
+      kv.push('来源' + '[客户端]');
+    } else if (program.src === 'sd') {
+      kv.push('来源' + '[数据库]');
+    }
     kv.push('时间' + '[' + stat.ctime.toISOString() + ']');
     this.emit('data', String(kv));
   }))
