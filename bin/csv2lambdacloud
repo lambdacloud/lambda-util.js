@@ -19,7 +19,9 @@ program.version('0.0.1')
   .option('-D, --debug', 'Enable Debugging')
   .option('-P, --proxy <http proxy>', 'Set proxy')
   .option('-B, --batch <batch size>', 'Set http uploading request batch size, by default: 64', 64)
-  .option('-s, --src <source from end>', 'set source from ss("服务器"), sc("客户端"), sd("数据库")')
+  .option('-s, --ss', 'set source from ss("服务器")')
+  .option('-c, --sc', 'set source from sc("客户端")')
+  .option('-d, --sd', 'set source from sd("数据库")')
   .option('-T, --token <token of lambdacloud>', 'Specify the token')
   .option('-F, --file <file to read>', 'Specify the file to read, get the absoulate path to read')
   .parse(process.argv);
@@ -52,11 +54,11 @@ fs.createReadStream(program.file)
     _.forEach(data, function(value, key) {
       kv.push(key + '[' + value + ']');
     });
-    if (program.src === 'ss') {
+    if (program.ss) {
       kv.push('来源' + '[服务器]');
-    } else if (program.src === 'sc') {
+    } else if (program.sc) {
       kv.push('来源' + '[客户端]');
-    } else if (program.src === 'sd') {
+    } else if (program.sd) {
       kv.push('来源' + '[数据库]');
     } else {
       throw new Error("--src must be ss, sc or sd");
