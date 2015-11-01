@@ -61,7 +61,7 @@ fs.createReadStream(program.file)
     } else if (program.sd) {
       kv.push('来源' + '[数据库]');
     } else {
-      throw new Error("--src must be ss, sc or sd");
+      throw new Error("you must choose its origin");
     }
     kv.push('时间' + '[' + stat.ctime.toISOString() + ']');
     this.emit('data', String(kv));
