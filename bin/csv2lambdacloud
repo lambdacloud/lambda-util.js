@@ -19,9 +19,10 @@ program.version('0.0.1')
   .option('-D, --debug', 'Enable Debugging')
   .option('-P, --proxy <http proxy>', 'Set proxy')
   .option('-B, --batch <batch size>', 'Set http uploading request batch size, by default: 64', 64)
-  .option('-s, --ss', 'set source from ss("服务器")')
-  .option('-c, --sc', 'set source from sc("客户端")')
-  .option('-d, --sd', 'set source from sd("数据库")')
+  .option('-s, --src <source from>', 'Set the source from where')
+  .option('--ss', 'set source from ss("服务器")')
+  .option('--sc', 'set source from sc("客户端")')
+  .option('--sd', 'set source from sd("数据库")')
   .option('-T, --token <token of lambdacloud>', 'Specify the token')
   .option('-F, --file <file to read>', 'Specify the file to read, get the absoulate path to read')
   .parse(process.argv);
@@ -54,11 +55,14 @@ fs.createReadStream(program.file)
     _.forEach(data, function(value, key) {
       kv.push(key + '[' + value + ']');
     });
-    if (program.ss) {
+    if (program.src) {
+      kv.push('来源' + '[' + program.src + ']');
+      console.log(program.src);
+    } else if ((program.src === undefined) && program.ss) {
       kv.push('来源' + '[服务器]');
-    } else if (program.sc) {
+    } else if ((program.src === undefined) && program.sc) {
       kv.push('来源' + '[客户端]');
-    } else if (program.sd) {
+    } else if ((program.src === undefined) && program.sd) {
       kv.push('来源' + '[数据库]');
     } else {
       throw new Error("you must choose its origin");
