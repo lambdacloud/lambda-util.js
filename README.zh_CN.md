@@ -100,6 +100,47 @@ $ bin/elastic2csv --help
   $ bin/elastic2csv --host es.cluster.ldp:19200 --indices logstash-2015.03.03 --type login --columns user_id,doc_timestamp > log.csv
 ```
 
+### csv2lambdacloud
+
+将 本地 的数据以 csv 格式导入。后面连接我们的shanghai服务即可。
+
+#### 命令
+    bin/bin/csv2lambdacloud -H <ElasticHost:[port]> --token <user token> --file <path> --type <_type>
+
+#### 参数列表
+
+```
+$ bin/csv2lambdacloud --help
+
+  Usage: csv2lambdacloud [options]
+
+  Options:
+
+    '-H, --host <Front End Host>', 'Specify front end host and port, default: api.lambdacloud.com', 'api.lambdacloud.com'
+    '-D, --debug', 'Enable Debugging'
+    '-P, --proxy <http proxy>', 'Set proxy'
+    '-T, --type <ES type>', 'Set type'
+    '-B, --batch <batch size>', 'Set http uploading request batch size, by default: 64'
+    '-s, --src <source from>', 'Set the source from where'
+    '--ss', 'set source from ss("服务器")'
+    '--sc', 'set source from sc("客户端")'
+    '--sd', 'set source from sd("数据库")'
+    '-T, --token <token of lambdacloud>', 'Specify the token'
+    '-F, --file <file to read>', 'Specify the file to read, get the absoulate path to read'
+```
+
+#### 示例
+1. 将本地'~/UserInfo_DB/2015-10-29.csv'以CSV格式导入，本地启动后台服务，地址'localhost:3000', 查看控制台标准输出，到'logs/*.log'中查看文件变化
+ ```
+  $ node bin/csv2lambdacloud -H 'localhost:3000' --token 'user_token' --sd(--ss, --sc) --file '~/UserInfo_DB/2015-10-18.csv' --type 'userinfo_db'
+```
+
+2. 将数据通过shanghai，直接导入我们的后台，把‘－h’省略即可
+ ```
+  $ node bin/csv2lambdacloud --token '18317FF3-2E16-40B4-B4F7-69F352996255' --sd --file '~/UserInfo_DB/2015-10-30.csv' --type 'userinfo_db'
+```
+
+
 ## LambdaCloud 相关工具
 
 此类工具是和览云共有云服务相关工具，提供日志的上载等相关服务。
