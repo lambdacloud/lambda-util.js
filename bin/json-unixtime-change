@@ -1,0 +1,44 @@
+#!/usr/bin/env node
+/**
+ * LambdaCloud copyright 2015.
+ *
+ */
+
+var program = require('commander');
+var _ = require('lodash');
+var jsonStream = require("json-stream");
+var eventStream = require('event-stream');
+var moment = require('moment');
+
+//use stream, jsonAddField to pipe data to standard output
+var lambdaUtil = require('../lambda-util');
+var stream = jsonStream();
+var jsonLine = new lambdaUtil.JsonLine();
+var conf = require('../conf/unixtime.js');
+var lib = require('../lib/unixtime.js');
+
+// use pipe deal with the data from standard in
+process.stdin
+  .pipe(stream)
+  .pipe(eventStream.through(jsonAddOtherTimeField))
+  .pipe(jsonLine)
+  .pipe(process.stdout);
+
+
+function jsonAddOtherTimeField(data) {
+
+  data._source= _.reduce(conf, function(result,v,k){
+
+    result = data._source;
+
+    if (result[k]) {
+      var newfield = lib[v](result[k]);
+      result["@" + k ] = newfield.format('YYYY-MM-DDT00:00:00.000') + 'Z';
+    }
+
+    return result;
+  });
+
+  this.push(data);
+}
+
