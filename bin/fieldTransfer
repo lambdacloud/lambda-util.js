@@ -17,7 +17,7 @@ var jsonLine = new lambdaUtil.JsonLine();
 var conf = require('../conf/fieldTransfer.js');
 var lib = require('../lib/fieldTransfer.js');
 
-process.stdin.setEncoding = ('UTF-8');
+process.stdin.setEncoding('UTF-8');
 
 // use pipe deal with the data from standard in
 process.stdin
@@ -28,10 +28,11 @@ process.stdin
 
 
 function fieldTransfer(data) {
+
   data._source= _.reduce(conf, function(result,v,k){
     if (result[k]) {
-      if (String(k).substring(0,1) == '#') {
-        result["@" + String(k).substring(1)] = lib[v](result[k]);
+      if (k.substring(0,1) === '#') {
+        result["@" + k.substring(1)] = lib[v](result[k]);
       } else {
         result["@" + k ] = lib[v](result[k]);
       }
