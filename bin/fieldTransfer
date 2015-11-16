@@ -28,18 +28,16 @@ process.stdin
 
 
 function fieldTransfer(data) {
-
   data._source= _.reduce(conf, function(result,v,k){
-
-    result = data._source;
-
     if (result[k]) {
-      var newfield = lib[v](result[k]);
-      result["@" + k ] = newfield.format('YYYY-MM-DDT00:00:00.000') + 'Z';
+      if (String(k).substring(0,1) == '#') {
+        result["@" + String(k).substring(1)] = lib[v](result[k]);
+      } else {
+        result["@" + k ] = lib[v](result[k]);
+      }
     }
-
     return result;
-  });
+  },data._source);
 
   this.push(data);
 }
