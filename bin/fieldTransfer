@@ -14,18 +14,20 @@ var moment = require('moment');
 var lambdaUtil = require('../lambda-util');
 var stream = jsonStream();
 var jsonLine = new lambdaUtil.JsonLine();
-var conf = require('../conf/unixtime.js');
-var lib = require('../lib/unixtime.js');
+var conf = require('../conf/fieldTransfer.js');
+var lib = require('../lib/fieldTransfer.js');
+
+process.stdin.setEncoding = ('UTF-8');
 
 // use pipe deal with the data from standard in
 process.stdin
   .pipe(stream)
-  .pipe(eventStream.through(jsonAddOtherTimeField))
+  .pipe(eventStream.through(fieldTransfer))
   .pipe(jsonLine)
   .pipe(process.stdout);
 
 
-function jsonAddOtherTimeField(data) {
+function fieldTransfer(data) {
 
   data._source= _.reduce(conf, function(result,v,k){
 
