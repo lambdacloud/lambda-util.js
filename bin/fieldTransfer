@@ -1,0 +1,45 @@
+#!/usr/bin/env node
+/**
+ * LambdaCloud copyright 2015.
+ *
+ */
+
+var program = require('commander');
+var _ = require('lodash');
+var jsonStream = require("json-stream");
+var eventStream = require('event-stream');
+var moment = require('moment');
+
+//use stream, jsonAddField to pipe data to standard output
+var lambdaUtil = require('../lambda-util');
+var stream = jsonStream();
+var jsonLine = new lambdaUtil.JsonLine();
+var conf = require('../conf/fieldTransfer.js');
+var lib = require('../lib/fieldTransfer.js');
+
+process.stdin.setEncoding('UTF-8');
+
+// use pipe deal with the data from standard in
+process.stdin
+  .pipe(stream)
+  .pipe(eventStream.through(fieldTransfer))
+  .pipe(jsonLine)
+  .pipe(process.stdout);
+
+
+function fieldTransfer(data) {
+
+  data._source= _.reduce(conf, function(result,v,k){
+    if (result[k]) {
+      if (k.substring(0,1) === '#') {
+        result["@" + k.substring(1)] = lib[v](result[k]);
+      } else {
+        result["@" + k ] = lib[v](result[k]);
+      }
+    }
+    return result;
+  },data._source);
+
+  this.push(data);
+}
+
