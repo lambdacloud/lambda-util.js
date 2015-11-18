@@ -39,7 +39,7 @@ _.forEach(['token', 'file'], function (opt) {
   assert(program[opt], '--' + opt + ' is missing, exit.');
 });
 
-var lambdaUtil = require('../lambda-util');
+var lambdaUtil = require('../../../lambda-util');
 var lambdaUploader = new lambdaUtil.LambdacloudUploader({ host: program.host, token: program.token, proxy: program.proxy });
 var elasticBulkArray = new lambdaUtil.ElasticBulkArray(program.batch);
 
@@ -58,19 +58,6 @@ fs.createReadStream(program.file)
       kv.push(key + '[' + String(value) + ']');
     });
 
-    if (program.src) {
-      kv.push('来源' + '[' + program.src + ']');
-      console.log(program.src);
-    } else if ((program.src === undefined) && program.ss) {
-      kv.push('来源' + '[服务器]');
-    } else if ((program.src === undefined) && program.sc) {
-      kv.push('来源' + '[客户端]');
-    } else if ((program.src === undefined) && program.sd) {
-      kv.push('来源' + '[数据库]');
-    } else {
-      throw new Error("you must choose its origin");
-    }
-
     if (program.type) {
       kv.push('日志类型' + '[' + program.type + ']');
     }
@@ -78,7 +65,7 @@ fs.createReadStream(program.file)
     if (data.ldp_date) {
       kv.push('时间' + '[' + moment(data.ldp_date).add(8, 'h').toISOString() + ']');
     } else {
-      kv.push('时间' + '[' + stat.ctime.toISOString() + ']');
+      kv.push('时间' + '[' + stat.mtime.toISOString() + ']');
     }
 
     this.emit('data', String(kv));

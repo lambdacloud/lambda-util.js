@@ -1,0 +1,51 @@
+#!/usr/bin/env node
+/**
+ * LambdaCloud copyright 2015.
+ *
+ */
+var program = require('commander');
+var _ = require('lodash');
+var jsonStream = require("json-stream");
+var eventStream = require('event-stream');
+var SHA256 = require("crypto-js/sha256");
+
+//use stream, jsonAddOrigin to pipe data to standard output
+var lambdaUtil = require('../lambda-util');
+var stream = jsonStream();
+var jsonLine = new lambdaUtil.JsonLine();
+
+process.stdin.setEncoding('utf8');
+
+// use pipe deal with the data from standard in
+process.stdin
+  .pipe(stream)
+  .pipe(eventStream.through(json2MoreMessage))
+  .pipe(jsonLine)
+  .pipe(process.stdout);
+
+function json2MoreMessage(data) {
+  // distinguish the data source
+  var self = this;
+  var oneMessage = {};
+  //_.forEach(data, function(value, key) {
+  //  oneMessage[key] = value;
+  //});
+
+  var start = data._source.message.indexOf('jheros') + 7;
+  var end = data._source.message.indexOf('jprods[') - 2;
+  var heroJsons = JSON.parse(data._source.message.substring(start, end));
+  _.forEach(heroJsons, function(value, key) {
+    oneMessage._source = _.clone(data._source, true);
+    oneMessage._source.jhero__key = key;
+    _.forEach(value, function(v, k) {
+      oneMessage._source['jhero_' + k] = v;
+    });
+    oneMessage._index = data._index;
+    oneMessage._type = 'core_user_db__flat_jheros';
+    oneMessage._source.ldp_origin_type = data._source['log_type'];
+    oneMessage._source.ldp_origin_id = data._id;
+    oneMessage._id = SHA256(JSON.stringify(oneMessage)).toString();
+    //console.log("hhaha: " + JSON.stringify(oneMessage));
+    self.push(oneMessage);
+  });
+}
