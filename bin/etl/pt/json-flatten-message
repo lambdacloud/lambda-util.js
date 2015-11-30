@@ -10,7 +10,7 @@ var eventStream = require('event-stream');
 var SHA256 = require("crypto-js/sha256");
 
 //use stream, jsonAddOrigin to pipe data to standard output
-var lambdaUtil = require('../lambda-util');
+var lambdaUtil = require('../../../lambda-util');
 var stream = jsonStream();
 var jsonLine = new lambdaUtil.JsonLine();
 
