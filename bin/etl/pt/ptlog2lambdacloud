@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 /**
+ * This is a tool to add 时间 field to core_account,core_aliorder,core_alipayrecord,core_arenaresult,core_card,core_firstlott,core_hunt,core_mine
+and push them into ES
  * LambdaCloud copyright 2015.
  *
  */
@@ -60,11 +62,14 @@ fs.createReadStream(program.file)
       kv.push(key + '[' + String(value) + ']');
     });
 
+//将type参数添加为日志类型
     if (program.type) {
       kv.push('日志类型' + '[' + program.type + ']');
     }
-// 判断type参数，分为两大类处理，添加 时间 字段，分别以timestamp与created_at作为时间字段的值
 
+//判断type参数，不同type对时间的值要求不同，t目前分为两大类处理，添加 时间 字段，分别以timestamp与created_at作为时间字段的值
+//timestamp和created_at是unix timestamp,单位是s,利用moment.unix()转化为时间对象，再利用toISOString()，返回ISO标准的时间字符串
+//其中xmorder，xmpayrecord采用和aliorder,alipayrecord相同的方式处理，都作为'core_aliorder_db' 以及 'core_alipayrecord_db'传入ES
     if (program.type === 'core_account_db' || program.type === 'core_aliorder_db' || program.type === 'core_arenaresult_db'
 || program.type === 'core_hunt_db') {
       if (data.timestamp) {
