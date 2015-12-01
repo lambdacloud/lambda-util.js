@@ -63,6 +63,7 @@ fs.createReadStream(program.file)
     if (program.type) {
       kv.push('日志类型' + '[' + program.type + ']');
     }
+// 判断type参数，分为两大类处理，添加 时间 字段，分别以timestamp与created_at作为时间字段的值
 
     if (program.type === 'core_account_db' || program.type === 'core_aliorder_db' || program.type === 'core_arenaresult_db'
 || program.type === 'core_hunt_db') {
