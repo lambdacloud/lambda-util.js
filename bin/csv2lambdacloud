@@ -55,7 +55,7 @@ fs.createReadStream(program.file)
   .pipe(eventStream.through(function(data) {
     var kv = [];
     _.forEach(data, function(value, key) {
-      kv.push(key + '[' + String(value) + ']');
+      kv.push(key + '[' + String(value) + ']');   //value 可能是一个字符串，也可能是一个json，这边只需要把它当作字符串处理即可
     });
 
     if (program.src) {

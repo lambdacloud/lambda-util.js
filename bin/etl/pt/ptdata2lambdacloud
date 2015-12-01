@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * LambdaCloud copyright 2015.
+ * This is a tool to push core_arena, core_daylott, core_freelott, core_user into ES
  *
  */
 
@@ -21,10 +21,6 @@ program.version('0.0.1')
   .option('-P, --proxy <http proxy>', 'Set proxy')
   .option('-T, --type <ES type>', 'Set type')
   .option('-B, --batch <batch size>', 'Set http uploading request batch size, by default: 64', 64)
-  .option('-s, --src <source from>', 'Set the source from where')
-  .option('--ss', 'set source from ss("服务器")')
-  .option('--sc', 'set source from sc("客户端")')
-  .option('--sd', 'set source from sd("数据库")')
   .option('-T, --token <token of lambdacloud>', 'Specify the token')
   .option('-F, --file <file to read>', 'Specify the file to read, get the absoulate path to read')
   .parse(process.argv);
@@ -42,7 +38,6 @@ _.forEach(['token', 'file'], function (opt) {
 var lambdaUtil = require('../../../lambda-util');
 var lambdaUploader = new lambdaUtil.LambdacloudUploader({ host: program.host, token: program.token, proxy: program.proxy });
 var elasticBulkArray = new lambdaUtil.ElasticBulkArray(program.batch);
-
 var parser = parse({delimiter: ',', columns: true});
 var stat = fs.statSync(program.file);
 
@@ -62,6 +57,8 @@ fs.createReadStream(program.file)
       kv.push('日志类型' + '[' + program.type + ']');
     }
 
+    //假如有ldp_date这个字段，那么就取这个字段的时间作为时间的输入，而这个时间是北京时间，需要转化为utc时间，所以需要add（8，‘h’）
+    //一般意义上，没有这个字段，直接取文件的改变时间（modify time）作为时间字段的值传进去
     if (data.ldp_date) {
       kv.push('时间' + '[' + moment(data.ldp_date).add(8, 'h').toISOString() + ']');
     } else {

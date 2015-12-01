@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * LambdaCloud copyright 2015.
+ * This is a tool to split sql backup into csv files
  *
  */
 
@@ -16,7 +16,6 @@ var _ = require('lodash');
 var csv = require('csv-formatter');
 var streamify = require('stream-array');
 var parse = require('csv-parse');
-
 
 program.version('0.1.0')
   .option('-F, --file <file to read>', 'Specify the file to read, get the absoulate path to read')
@@ -37,22 +36,22 @@ var ldp_server_id;
 fs.createReadStream('./' + program.file)
   .pipe(linestream)
   .pipe(eventStream.map(getATable));
-//byline.createStream(fs.createReadStream('./' + program.file))
-//  .pipe(eventStream.map(getATable));
-
 
 function getATable(data) {
   data = String(data);
+  //确定数据库表的名字以及头部
   var regDB = /COPY (.*) \((.*)\) FROM stdin/;
+  //确定数据库表的结尾
   var regDBEnd = /^\\\./;
+  //识别文件名，文件命名规则: 20151118.xiaomi2.sql
   var regFilename = /.*\.([a-zA-Z]+)(\d+)\.sql/;
   if (regFilename.test(program.file)) {
+    // 得到渠道名，服务器名，服务器id
     ldp_server_name = program.file.match(regFilename)[1] + program.file.match(regFilename)[2];
     ldp_branch_name = program.file.match(regFilename)[1];
     ldp_server_id = program.file.match(regFilename)[2];
   } else {
-    console.log(program.file);
-    console.log("error");
+    throw program.file + ' is error, mismatch';
   }
 
   if (status && data !== '\\.') {

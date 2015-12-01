@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 /**
- * LambdaCloud copyright 2015.
- *
+ * This is a tool to flat core_user_db type, flatten its jheros
  */
 var program = require('commander');
 var _ = require('lodash');
@@ -9,7 +8,7 @@ var jsonStream = require("json-stream");
 var eventStream = require('event-stream');
 var SHA256 = require("crypto-js/sha256");
 
-//use stream, jsonAddOrigin to pipe data to standard output
+//use stream, json2MoreMessage to pipe data to standard output
 var lambdaUtil = require('../../../lambda-util');
 var stream = jsonStream();
 var jsonLine = new lambdaUtil.JsonLine();
@@ -27,13 +26,18 @@ function json2MoreMessage(data) {
   // distinguish the data source
   var self = this;
   var oneMessage = {};
-  //_.forEach(data, function(value, key) {
-  //  oneMessage[key] = value;
-  //});
-
+  //这边需要使用curl去查看具体core_user_db的数据，从其中分割出jheros字段
+  //这里是用的 ‘＋7’， ‘－2’，是由于需要匹配到jheros的需要
   var start = data._source.message.indexOf('jheros') + 7;
   var end = data._source.message.indexOf('jprods[') - 2;
-  var heroJsons = JSON.parse(data._source.message.substring(start, end));
+  //得到jheros后，将它parse为json，然后再作处理
+  var heroJsons;
+  try {
+    heroJsons = JSON.parse(data._source.message.substring(start, end));
+  } catch(err) {
+    throw err;
+  }
+  //给oneMessage赋值，每得到一个元素就将它发送，具体字段根据需求来设置
   _.forEach(heroJsons, function(value, key) {
     oneMessage._source = _.clone(data._source, true);
     oneMessage._source.jhero__key = key;
@@ -45,7 +49,6 @@ function json2MoreMessage(data) {
     oneMessage._source.ldp_origin_type = data._source['log_type'];
     oneMessage._source.ldp_origin_id = data._id;
     oneMessage._id = SHA256(JSON.stringify(oneMessage)).toString();
-    //console.log("hhaha: " + JSON.stringify(oneMessage));
     self.push(oneMessage);
   });
 }
