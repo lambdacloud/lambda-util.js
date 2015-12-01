@@ -1,0 +1,91 @@
+#!/usr/bin/env node
+/**
+ * This is a tool to add 时间 field to core_account,core_aliorder,core_alipayrecord,core_arenaresult,core_card,core_firstlott,core_hunt,core_mine
+and push them into ES
+ * LambdaCloud copyright 2015.
+ *
+ */
+
+'use strict';
+
+var assert = require('assert');
+var fs = require('fs');
+var program = require('commander');
+var eventStream = require('event-stream');
+var moment = require('moment');
+var _ = require('lodash');
+var parse = require('csv-parse');
+
+// Get command line arguments, now is form standard input
+program.version('0.0.1')
+  .option('-H, --host <Front End Host>', 'Specify front end host and port, default: api.lambdacloud.com', 'api.lambdacloud.com')
+  .option('-D, --debug', 'Enable Debugging')
+  .option('-P, --proxy <http proxy>', 'Set proxy')
+  .option('-T, --type <ES type>', 'Set type')
+  .option('-B, --batch <batch size>', 'Set http uploading request batch size, by default: 64', 64)
+  .option('-s, --src <source from>', 'Set the source from where')
+  .option('--ss', 'set source from ss("服务器")')
+  .option('--sc', 'set source from sc("客户端")')
+  .option('--sd', 'set source from sd("数据库")')
+  .option('-T, --token <token of lambdacloud>', 'Specify the token')
+  .option('-F, --file <file to read>', 'Specify the file to read, get the absoulate path to read')
+  .parse(process.argv);
+
+if (program.debug) {
+  var debug = require('debug');
+  debug.enable('lambdacloud-uploader:debug');
+}
+
+// Required options
+_.forEach(['token', 'file'], function (opt) {
+  assert(program[opt], '--' + opt + ' is missing, exit.');
+});
+
+var lambdaUtil = require('../../../lambda-util');
+var lambdaUploader = new lambdaUtil.LambdacloudUploader({ host: program.host, token: program.token, proxy: program.proxy });
+var elasticBulkArray = new lambdaUtil.ElasticBulkArray(program.batch);
+
+var parser = parse({delimiter: ',', columns: true});
+var stat = fs.statSync(program.file);
+
+
+process.stdin.setEncoding('utf8');
+
+//use pipe handle rawdata into elasticsearch
+fs.createReadStream(program.file)
+  .pipe(parser)
+  .pipe(eventStream.through(function(data) {
+    //console.log(data);
+    //console.log(data.timestamp);
+    var kv = [];
+    _.forEach(data, function(value, key) {
+      kv.push(key + '[' + String(value) + ']');
+    });
+
+//将type参数添加为日志类型
+    if (program.type) {
+      kv.push('日志类型' + '[' + program.type + ']');
+    }
+
+//判断type参数，不同type对时间的值要求不同，t目前分为两大类处理，添加 时间 字段，分别以timestamp与created_at作为时间字段的值
+//timestamp和created_at是unix timestamp,单位是s,利用moment.unix()转化为时间对象，再利用toISOString()，返回ISO标准的时间字符串
+//其中xmorder，xmpayrecord采用和aliorder,alipayrecord相同的方式处理，都作为'core_aliorder_db' 以及 'core_alipayrecord_db'传入ES
+    if (program.type === 'core_account_db' || program.type === 'core_aliorder_db' || program.type === 'core_arenaresult_db'
+|| program.type === 'core_hunt_db') {
+      if (data.timestamp) {
+        kv.push('时间' + '[' + moment.unix(data.timestamp).toISOString() + ']');
+      }
+    }    
+
+    if (program.type === 'core_alipayrecord_db' || program.type === 'core_card_db' || program.type === 'core_firstlott_db'
+|| program.file === 'core_mine_db') {
+      if (data.created_at) {
+        kv.push('时间' + '[' + moment.unix(data.created_at).toISOString() + ']');
+      }
+    }
+  
+    this.emit('data', String(kv));
+  }))
+  //.pipe(process.stdout);
+  .pipe(elasticBulkArray)
+  .pipe(lambdaUploader);
