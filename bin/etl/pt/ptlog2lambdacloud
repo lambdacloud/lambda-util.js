@@ -78,7 +78,7 @@ fs.createReadStream(program.file)
     }    
 
     if (program.type === 'core_alipayrecord_db' || program.type === 'core_card_db' || program.type === 'core_firstlott_db'
-|| program.file === 'core_mine_db') {
+|| program.type === 'core_mine_db') {
       if (data.created_at) {
         kv.push('时间' + '[' + moment.unix(data.created_at).toISOString() + ']');
       }
