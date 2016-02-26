@@ -15,8 +15,9 @@ var format = require('string-template');
 var moment = require('moment');
 var flatten = require('flat');
 var byline = require('byline');
+var lambdaUtil = require('../../../lambda-util');
 var lineTrans = new byline.LineStream();
-
+var jsonStream = require("json-stream");
 // use pipe deal with the data from standard in
 // and output the result to stdout
 process.stdin
@@ -193,7 +194,6 @@ function getMapResult(result) {
   return result;
 }
 
-//parse token
 function parseToken(data) {
   var regex = /token\[(\w+)-(\d+)-(\d+?)\]/i;
   if (regex.test(data)) {
