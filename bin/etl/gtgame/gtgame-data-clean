@@ -1,0 +1,76 @@
+#!/usr/bin/env node
+/**
+ * This is a tool to clean gtgame.tyrion data
+ *
+ */
+
+'use strict';
+
+//var assert = require('assert');
+var byline = require('byline');
+var fs = require('fs');
+var program = require('commander');
+var eventStream = require('event-stream');
+var moment = require('moment');
+var _ = require('lodash');
+
+var linestream = new byline.LineStream();
+
+program.version('0.1.0')
+  .option('-F, --file <file to read>', 'Specify the file to read, get the absoulate path to read')
+  .parse(process.argv);
+
+process.stdin.setEncoding('utf8');
+
+fs.createReadStream('./' + program.file)
+  .pipe(linestream)
+  .pipe(eventStream.through(getATable))
+  .pipe(eventStream.through(formatAJson))
+  .pipe(process.stdout);
+
+function getATable(data) {
+  var element = String(data);
+  var regJsonLine = /(,?)(\{.*\})/;
+  if (!regJsonLine.test(element)) {
+    this.push(element)
+  } else {
+    var elem1 = element.match(regJsonLine)[1];      //因为elastic－dump中的格式需要，所以后面需要加上','
+    var elem2 = element.match(regJsonLine)[2];
+    var timeStr;
+
+    try {
+      elem2 = JSON.parse(elem2);
+      if (elem2['_source']['startTime']) {          //startTime必须放在前面，因为upgrade类型中包含有两个时间字段，startTime，time，而我们要去的应该是startTime
+        timeStr = elem2['_source']['startTime'];
+      } else if (elem2['_source']['ctime']) {
+        timeStr = elem2['_source']['ctime'];
+      } else if (elem2['_source']['time']) {
+        timeStr = elem2['_source']['time'];
+      } else if (elem2['_source']['utime']) {
+        timeStr = elem2['_source']['utime'];
+      } else if (elem2['_source']['updateTime']) {
+        timeStr = elem2['_source']['updateTime'];
+      } else if (elem2['_source']['endTime']) {
+        timeStr = elem2['_source']['endTime'];
+      } else if (elem2['_source']['last_login_time']) {
+        timeStr = elem2['_source']['last_login_time'];
+      } else if (elem2['_source']['lastReceivedTime']) {
+        timeStr = elem2['_source']['lastReceivedTime'];
+      } else if (elem2['_source']['lastHpUpdateTime']) {
+        timeStr = elem2['_source']['lastHpUpdateTime'];
+      } else {
+        timeStr = "2015-12-25T12:12:00.838Z";     //随便取得一个值，能正确设置好index就成
+      }
+      //timeStr = timeStr.substring(0, 10);
+      elem2['_source']['_index'] = elem2['_index'];
+      elem2['_index'] = 'gtgame.tyrion@' + elem2['_source']['date'];
+    } catch(e) {
+      console.log("error: " + e);
+    }
+    this.push(elem1 + JSON.stringify(elem2));
+  }
+}
+function formatAJson(data) {
+  data = data + "\n";
+  this.push(data);
+}
